@@ -20,6 +20,6 @@ internal static class SolutionMethodFactory
 
     static bool IsLabeledWithResult(MethodInfo method)
     {
-        return method.CustomAttributes.Any(attribute => attribute.AttributeType == typeof(ResultAttribute));
+        return method.GetParameters().Any(parameter => parameter.CustomAttributes.Any(attribute => attribute.AttributeType == typeof(ResultAttribute)));
     }
 }
