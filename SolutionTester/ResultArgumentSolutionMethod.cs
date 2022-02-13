@@ -10,7 +10,7 @@ internal class ResultArgumentSolutionMethod : SolutionMethod
     {
     }
 
-    protected override void ProcessResult(object? rawResult)
+    protected override void ProcessResult(object? _)
     {
         var resultParameterPosition = _method.GetParameters().Single(parameter => parameter.GetCustomAttribute(typeof(ResultAttribute)) is not null).Position;
         Result = Arguments[resultParameterPosition];
