@@ -5,16 +5,18 @@ public class SolutionTester<TSolution> where TSolution : class, new()
     readonly TSolution _solution;
     readonly SolutionMethod _solutionMethod;
 
-    object _actualResult;
-    object _expectedResult;
+    object? _actualResult;
+    object? _expectedResult;
 
-    public SolutionTester()
+    public SolutionTester() : this(new()) { }
+
+    public SolutionTester(TSolution solutionContainer)
     {
-        _solution = new();
+        _solution = solutionContainer;
         _solutionMethod = SolutionMethodFactory.SearchSolutionContainer(_solution);
     }
 
-    public void Test(object[] arguments, object expectedResult)
+    public void Test(object?[]? arguments = null, object? expectedResult = null)
     {
         _expectedResult = expectedResult;
         _solutionMethod.Arguments = arguments;

@@ -9,5 +9,4 @@ internal static class SolutionMethodFactory
         if (solutionMethod.HasResultAttribute()) return new ResultArgumentSolutionMethod(solutionMethod, solutionContainer);
         throw new ApplicationException("Something went wrong when trying to detect the solution method.");
     }
-
 }
