@@ -42,6 +42,11 @@ internal static class SolutionMethodValidator
 
         return hasSolutionAttribute && hasCorrectReturnType;
     }
+    internal static bool IsOutputSolution(this MethodInfo method)
+    {
+        return method.CustomAttributes.Any(attribute => attribute.AttributeType == typeof(SolutionAttribute));
+    }
+
     internal static bool IsValidInputSolution(this MethodInfo method)
     {
         int resultAttributesCount = method.GetParameters().
@@ -56,10 +61,6 @@ internal static class SolutionMethodValidator
         if (resultAttributesCount > 0 && !hasCorrectReturnType) throw new FormatException("Method labeled with [Result] must return void.");
 
         return resultAttributesCount == 1;
-    }
-    internal static bool IsOutputSolution(this MethodInfo method)
-    {
-        return method.CustomAttributes.Any(attribute => attribute.AttributeType == typeof(SolutionAttribute));
     }
     internal static bool IsInputSolution(this MethodInfo method)
     {

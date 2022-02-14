@@ -30,9 +30,12 @@ internal abstract class SolutionMethod
 
     internal SolutionMethod(MethodInfo method, object solutionContainer)
     {
+        EnsureSolutionMethodIsValid(method);
+
         _method = method;
         _solutionContainer = solutionContainer;
     }
+    protected abstract void EnsureSolutionMethodIsValid(MethodInfo method);
     
     internal object? Invoke()
     {
