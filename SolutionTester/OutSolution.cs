@@ -2,11 +2,11 @@
 
 namespace CCHelper;
 
-internal class ReturnValueSolutionMethod : SolutionMethod
+internal class OutSolution : SolutionMethod
 {
     internal override Type ResultType => _resultType ??= _method.ReturnType;
 
-    internal ReturnValueSolutionMethod(MethodInfo method, object solutionContainer) : base(method, solutionContainer)
+    internal OutSolution(MethodInfo method, object solutionContainer) : base(method, solutionContainer)
     {
     }
 

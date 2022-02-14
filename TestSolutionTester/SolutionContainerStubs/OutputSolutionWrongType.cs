@@ -2,7 +2,7 @@
 
 namespace TestSolutionTester;
 
-internal class WrongTypeSolutionProvider
+internal class OutputSolutionWrongType
 {
     [Solution]
     public void SolutionMethod()

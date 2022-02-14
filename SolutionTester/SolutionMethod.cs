@@ -4,8 +4,8 @@ namespace CCHelper;
 
 internal abstract class SolutionMethod
 {
-    protected MethodInfo _method;
     readonly object _solutionContainer;
+    protected MethodInfo _method;
     object?[]? _arguments;
     protected Type? _resultType;
 

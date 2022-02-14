@@ -2,7 +2,7 @@
 
 namespace TestSolutionTester;
 
-internal class MultipleSolutionMethodsProvider
+internal class MultipleSolutionMethods
 {
     [Solution]
     public int FirstSolutionMethod()

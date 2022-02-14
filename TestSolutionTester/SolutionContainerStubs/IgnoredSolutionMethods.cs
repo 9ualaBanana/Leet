@@ -2,7 +2,7 @@
 
 namespace TestSolutionTester;
 
-internal class EmptySolutionContainer
+internal class IgnoredSolutionMethods
 {
     [Solution]
     internal void Ignored([Result]int a, [Result]int b)

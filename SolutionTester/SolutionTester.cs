@@ -1,8 +1,8 @@
 ﻿namespace CCHelper;
 
-public class SolutionTester<TSolution> where TSolution : class, new()
+public class SolutionTester<TSolutionContainer> where TSolutionContainer : class, new()
 {
-    readonly TSolution _solution;
+    readonly TSolutionContainer _solutionContainer;
     readonly SolutionMethod _solutionMethod;
 
     object? _actualResult;
@@ -10,10 +10,10 @@ public class SolutionTester<TSolution> where TSolution : class, new()
 
     public SolutionTester() : this(new()) { }
 
-    public SolutionTester(TSolution solutionContainer)
+    public SolutionTester(TSolutionContainer solutionContainer)
     {
-        _solution = solutionContainer;
-        _solutionMethod = SolutionMethodFactory.SearchSolutionContainer(_solution);
+        _solutionContainer = solutionContainer;
+        _solutionMethod = SolutionMethodDiscovererFactory.SearchSolutionContainer(_solutionContainer);
     }
 
     public void Test(object?[]? arguments = null, object? expectedResult = null)

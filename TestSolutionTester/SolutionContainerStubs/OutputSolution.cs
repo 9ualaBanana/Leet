@@ -2,7 +2,7 @@
 
 namespace TestSolutionTester;
 
-internal class SolutionProvider
+internal class OutputSolution
 {
     [Solution]
     public int SolutionMethod()

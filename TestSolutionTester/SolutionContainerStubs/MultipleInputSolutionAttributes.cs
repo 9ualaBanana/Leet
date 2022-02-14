@@ -2,7 +2,7 @@
 
 namespace TestSolutionTester;
 
-internal class MultipleAttributesResultProvider
+internal class MultipleInputSolutionAttributes
 {
     public void SolutionMethod([Result]int a, [Result]int b)
     {

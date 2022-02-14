@@ -2,55 +2,66 @@
 
 namespace CCHelper;
 
+// Probably it's not used that much (only from the factory currently) to be instantiated as global static Singleton.
+// I mean the factory or any other client will be able to create it as a Transient service when needed.
 internal static class SolutionMethodValidator
 {
-    internal static MethodInfo DetectSolutionMethod(this IEnumerable<MethodInfo> methods)
+    static Predicate<MethodInfo>[] _validators = new Predicate<MethodInfo>[]
     {
-        var validSolutionMethods = methods.Where(IsValid);
+        IsValidOutputSolution,
+        IsValidInputSolution
+    };
+
+    internal static MethodInfo DiscoverSolutionMethod(this object container)
+    {
+        return GetSingleSolutionInContainerOrThrow(container);
+    }
+    static MethodInfo GetSingleSolutionInContainerOrThrow(this object container)
+    {
+        var validSolutionMethods = container.RetrieveValidSolutionMethods();
 
         if (!validSolutionMethods.Any()) throw new EntryPointNotFoundException("Solution method was not found inside the provided solution container.");
         if (validSolutionMethods.Count() > 1) throw new AmbiguousMatchException("Solution container must contain exactly one solution method.");
 
         return validSolutionMethods.Single();
     }
-    static bool IsValid(MethodInfo method)
+    static IEnumerable<MethodInfo> RetrieveValidSolutionMethods(this object container) => container.GetType().GetMethods().Where(IsValidSolutionMethod);
+    static bool IsValidSolutionMethod(MethodInfo method)
     {
-        bool isValidReturnValueSolutionMethod = method.IsValidReturnValueSolutionMethod();
-        bool isValidResultArgumentSolutionMethod = method.IsValidResulArgumentSolutionMethod();
-
-        return isValidReturnValueSolutionMethod ^ isValidResultArgumentSolutionMethod;
+        return _validators.Any(isValid => isValid(method));
     }
-    internal static bool IsValidReturnValueSolutionMethod(this MethodInfo method)
+
+    internal static bool IsValidOutputSolution(this MethodInfo method)
     {
-        bool hasSolutionAttribute = method.HasSolutionAttribute();
-        bool hasResultAttribute = method.HasResultAttribute();
+        bool hasSolutionAttribute = method.IsOutputSolution();
+        bool hasResultAttribute = method.IsInputSolution();
         bool hasCorrectReturnType = method.ReturnType != typeof(void);
 
         if (hasSolutionAttribute && hasResultAttribute) throw new AmbiguousMatchException("Solution method must be labeled with exactly one attribute.");
-        if (hasSolutionAttribute && !hasCorrectReturnType) throw new InvalidOperationException("Method labeled with [Solution] can't return void.");
+        if (hasSolutionAttribute && !hasCorrectReturnType) throw new FormatException("Method labeled with [Solution] can't return void.");
 
         return hasSolutionAttribute && hasCorrectReturnType;
     }
-    internal static bool IsValidResulArgumentSolutionMethod(this MethodInfo method)
+    internal static bool IsValidInputSolution(this MethodInfo method)
     {
         int resultAttributesCount = method.GetParameters().
             Where(parameter => parameter.CustomAttributes.
             Any(attribute => attribute.AttributeType == typeof(ResultAttribute))).Count();
         // No check for parameters presence is needed, as [Result] attribute can only be applied to parameters and that implies there is at least one.
-        bool hasSolutionAttribute = method.HasSolutionAttribute();
+        bool hasSolutionAttribute = method.IsOutputSolution();
         bool hasCorrectReturnType = method.ReturnType == typeof(void);
 
         if (hasSolutionAttribute && resultAttributesCount > 0) throw new AmbiguousMatchException("Solution method must be labeled with exactly one attribute.");
         if (resultAttributesCount > 1) throw new AmbiguousMatchException("Multiple [Result] attributes are not allowed.");
-        if (resultAttributesCount > 0 && !hasCorrectReturnType) throw new InvalidOperationException("Method labeled with [Result] must return void.");
+        if (resultAttributesCount > 0 && !hasCorrectReturnType) throw new FormatException("Method labeled with [Result] must return void.");
 
         return resultAttributesCount == 1;
     }
-    internal static bool HasSolutionAttribute(this MethodInfo method)
+    internal static bool IsOutputSolution(this MethodInfo method)
     {
         return method.CustomAttributes.Any(attribute => attribute.AttributeType == typeof(SolutionAttribute));
     }
-    internal static bool HasResultAttribute(this MethodInfo method)
+    internal static bool IsInputSolution(this MethodInfo method)
     {
         return method.GetParameters().
             Any(parameter => parameter.CustomAttributes.
