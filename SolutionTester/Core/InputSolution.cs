@@ -16,12 +16,8 @@ internal class InputSolution : SolutionMethod
                                .Single(parameter => parameter.GetCustomAttribute(typeof(ResultAttribute)) is not null)
                                .ParameterType;
 
-    internal InputSolution(MethodInfo method, object solutionContainer) : base(method, solutionContainer) 
+    internal InputSolution(MethodInfo method, object solutionContainer) : base(method, solutionContainer, SolutionMethodValidator.IsValidInputSolution) 
     {
-    }
-    protected override void EnsureSolutionMethodIsValid(MethodInfo method)
-    {
-        if (!method.IsValidInputSolution()) throw new InvalidOperationException("Wrong method was identified as InputSolution");
     }
 
     protected override void ProcessResult(object? _)

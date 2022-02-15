@@ -6,6 +6,7 @@ internal abstract class SolutionMethod
 {
     readonly object _solutionContainer;
     protected MethodInfo _method;
+    Predicate<MethodInfo>? _isValid;
     object?[]? _arguments;
     protected Type? _resultType;
 
@@ -28,15 +29,20 @@ internal abstract class SolutionMethod
     protected object? Result { get; set; }
     internal abstract Type ResultType { get; }
 
-    internal SolutionMethod(MethodInfo method, object solutionContainer)
+    internal SolutionMethod(MethodInfo method, object solutionContainer, Predicate<MethodInfo> validator)
     {
-        EnsureSolutionMethodIsValid(method);
+        _isValid = validator;
+        RunValidationLogic(method);
 
         _method = method;
         _solutionContainer = solutionContainer;
     }
-    protected abstract void EnsureSolutionMethodIsValid(MethodInfo method);
-    
+    protected void RunValidationLogic(MethodInfo method)
+    {
+        if (_isValid is null) throw new NotImplementedException($"Validation logic is not implemented/provided for the {this.GetType()}", new NullReferenceException());
+        if (!_isValid(method)) throw new InvalidOperationException($"Wrong method was identified as {this.GetType()}");
+    }
+
     internal object? Invoke()
     {
         var rawResult = _method.Invoke(_solutionContainer, Arguments);
