@@ -2,6 +2,11 @@
 
 namespace CCHelper;
 
+[AttributeUsage(AttributeTargets.Method, Inherited = false)]
+public class SolutionAttribute : Attribute
+{
+}
+
 internal class OutputSolution : SolutionMethod
 {
     internal override Type ResultType => _resultType ??= _method.ReturnType;

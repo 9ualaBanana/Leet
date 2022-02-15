@@ -2,6 +2,11 @@
 
 namespace CCHelper;
 
+[AttributeUsage(AttributeTargets.Parameter, Inherited = false)]
+public class ResultAttribute : Attribute
+{
+}
+
 // Arguments are never null for this type of SolutionMethod as [ResultAttribute] can only be applied to parameters
 // and this class is instantiated only when this attribute is present (it's checked by SolutionMethodValidator).
 internal class InputSolution : SolutionMethod
