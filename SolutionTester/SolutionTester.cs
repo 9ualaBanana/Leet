@@ -15,8 +15,7 @@ public class SolutionTester<TSolutionContainer> where TSolutionContainer : class
         _solutionContainer = solutionContainer;
         _solutionMethod = SolutionMethodDiscovererFactory.SearchSolutionContainer(_solutionContainer);
     }
-
-    public void Test(object?[]? arguments = null, object? expectedResult = null)
+    public void Test(object? expectedResult = null, params object?[]? arguments)
     {
         _expectedResult = expectedResult;
         _solutionMethod.Arguments = arguments;

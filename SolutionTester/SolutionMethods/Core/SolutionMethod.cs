@@ -34,8 +34,8 @@ internal abstract class SolutionMethod
         _isValid = validator;
         RunValidationLogic(method);
 
-        _method = method;
         _solutionContainer = solutionContainer;
+        _method = method;
     }
     protected void RunValidationLogic(MethodInfo method)
     {

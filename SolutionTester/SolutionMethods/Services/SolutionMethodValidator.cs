@@ -44,7 +44,7 @@ internal static class SolutionMethodValidator
     }
     internal static bool IsOutputSolution(this MethodInfo method)
     {
-        return method.CustomAttributes.Any(attribute => attribute.AttributeType == typeof(SolutionAttribute));
+        return method.IsDefined(typeof(SolutionAttribute));
     }
 
     internal static bool IsValidInputSolution(this MethodInfo method)
@@ -64,8 +64,6 @@ internal static class SolutionMethodValidator
     }
     internal static bool IsInputSolution(this MethodInfo method)
     {
-        return method.GetParameters().
-            Any(parameter => parameter.CustomAttributes.
-            Any(attribute => attribute.AttributeType == typeof(ResultAttribute)));
+        return method.GetParameters().Any(parameter => parameter.IsDefined(typeof(ResultAttribute)));
     }
 }
