@@ -5,42 +5,31 @@ namespace CCHelper;
 internal abstract class SolutionMethod
 {
     readonly object _solutionContainer;
-    protected MethodInfo _method;
-    Predicate<MethodInfo>? _isValid;
-    object?[]? _arguments;
+    readonly protected MethodInfo _method;
+    object[]? _arguments;
     protected Type? _resultType;
 
-    internal object?[]? Arguments 
-    { 
+    internal object[]? Arguments
+    {
         get => _arguments;
-        set
-        {
-            if (value is not null
-                && !_method.GetParameters()
-                          .Any(parameter => parameter.ParameterType.IsAssignableFrom(
-                              value[parameter.Position]?.GetType())
-                          ))
-            {
-                throw new ArgumentException("Types of provided arguments do not match the required parameters.", nameof(value));
-            }
-            _arguments = value;
-        }
+        set => _arguments = _argumentsProcessor.Process(value);
     }
+    ArgumentsProcessor _argumentsProcessor;
     protected object? Result { get; set; }
     internal abstract Type ResultType { get; }
 
-    internal SolutionMethod(MethodInfo method, object solutionContainer, Predicate<MethodInfo> validator)
+    protected SolutionMethod(MethodInfo method, object solutionContainer, Predicate<MethodInfo> validator)
     {
-        _isValid = validator;
-        RunValidationLogic(method);
+        Validate(method, validator);
 
         _solutionContainer = solutionContainer;
         _method = method;
+        _argumentsProcessor = new(method);
     }
-    protected void RunValidationLogic(MethodInfo method)
+    void Validate(MethodInfo method, Predicate<MethodInfo> validator)
     {
-        if (_isValid is null) throw new NotImplementedException($"Validation logic is not implemented/provided for the {this.GetType()}", new NullReferenceException());
-        if (!_isValid(method)) throw new InvalidOperationException($"Wrong method was identified as {this.GetType()}");
+        if (validator is null) throw new NotImplementedException($"Validation logic is not implemented/provided for the {this.GetType()}", new NullReferenceException());
+        if (!validator(method)) throw new InvalidOperationException($"Wrong method was identified as {this.GetType()}");
     }
 
     internal object? Invoke()
@@ -50,4 +39,41 @@ internal abstract class SolutionMethod
         return Result;
     }
     protected abstract void ProcessResult(object? rawResult);
+
+    class ArgumentsProcessor
+    {
+        readonly MethodInfo _method;
+        object[] _arguments;
+
+        internal ArgumentsProcessor(MethodInfo method)
+        {
+            _method = method;
+        }
+
+        internal object[]? Process(object[]? arguments)
+        {
+            if (arguments is null || arguments.Length == 0) return null;
+
+            _arguments = arguments;
+            ValidateTypeCompatibilityBetweenArgumentsAndParameters();
+            return _arguments;
+        }
+
+
+        void ValidateTypeCompatibilityBetweenArgumentsAndParameters()
+        {
+            foreach (var parameter in _method.GetParameters())
+            {
+                var correspondingArgumentType = _arguments[parameter.Position]?.GetType();
+                try
+                {
+                    Convert.ChangeType(_arguments[parameter.Position], parameter.ParameterType);
+                }
+                catch (InvalidCastException)
+                {
+                    throw new ArgumentException($"Parameter [{parameter.ParameterType}] `{parameter.Name}` can't be assigned the value of type [{correspondingArgumentType}] of the corresponding argument.");
+                }
+            }
+        }
+    }
 }
