@@ -9,7 +9,7 @@ internal abstract class SolutionMethod
     object[]? _arguments;
     protected Type? _resultType;
 
-    internal object[]? Arguments
+    internal object?[]? Arguments
     {
         get => _arguments;
         set => _arguments = _argumentsProcessor.Process(value);
@@ -43,33 +43,36 @@ internal abstract class SolutionMethod
     class ArgumentsProcessor
     {
         readonly MethodInfo _method;
-        object[] _arguments;
+        object[]? _arguments;
 
         internal ArgumentsProcessor(MethodInfo method)
         {
             _method = method;
         }
 
-        internal object[]? Process(object[]? arguments)
+        internal object[]? Process(object?[]? arguments)
         {
-            if (arguments is null || arguments.Length == 0) return null;
+            if (arguments?.Length == 0) return null;
+            ForbidNullArguments(arguments);
 
-            _arguments = arguments;
+            _arguments = arguments!;
             ValidateTypeCompatibilityBetweenArgumentsAndParameters();
             return _arguments;
         }
 
+        void ForbidNullArguments(object?[]? arguments)
+        {
+            if (arguments is not null && arguments.All(argument => argument is not null)) return;
+
+            throw new ArgumentNullException("argument", "null arguments are currently not supported.");
+        }
 
         void ValidateTypeCompatibilityBetweenArgumentsAndParameters()
         {
             foreach (var parameter in _method.GetParameters())
             {
-                var correspondingArgumentType = _arguments[parameter.Position]?.GetType();
-                try
-                {
-                    Convert.ChangeType(_arguments[parameter.Position], parameter.ParameterType);
-                }
-                catch (InvalidCastException)
+                var correspondingArgumentType = _arguments![parameter.Position]?.GetType();
+                if (!parameter.ParameterType.IsAssignableFrom(correspondingArgumentType))
                 {
                     throw new ArgumentException($"Parameter [{parameter.ParameterType}] `{parameter.Name}` can't be assigned the value of type [{correspondingArgumentType}] of the corresponding argument.");
                 }
