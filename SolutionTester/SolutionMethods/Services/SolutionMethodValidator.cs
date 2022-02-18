@@ -12,20 +12,8 @@ internal static class SolutionMethodValidator
         IsValidInputSolution
     };
 
-    internal static MethodInfo DiscoverSolutionMethod(this object container)
-    {
-        return GetSingleSolutionInContainerOrThrow(container);
-    }
-    static MethodInfo GetSingleSolutionInContainerOrThrow(this object container)
-    {
-        var validSolutionMethods = container.RetrieveValidSolutionMethods();
 
-        if (!validSolutionMethods.Any()) throw new EntryPointNotFoundException("Solution method was not found inside the provided solution container.");
-        if (validSolutionMethods.Count() > 1) throw new AmbiguousMatchException("Solution container must contain exactly one solution method.");
-
-        return validSolutionMethods.Single();
-    }
-    static IEnumerable<MethodInfo> RetrieveValidSolutionMethods(this object container) => container.GetType().GetMethods().Where(IsValidSolutionMethod);
+    internal static IEnumerable<MethodInfo> RetrieveValidSolutionMethods(this object container) => container.GetType().GetMethods().Where(IsValidSolutionMethod);
     static bool IsValidSolutionMethod(MethodInfo method)
     {
         return _validators.Any(isValid => isValid(method));
