@@ -6,12 +6,11 @@ namespace CCHelper;
 // I mean the factory or any other client will be able to create it as a Transient service when needed.
 internal static class SolutionMethodValidator
 {
-    static Predicate<MethodInfo>[] _validators = new Predicate<MethodInfo>[]
+    readonly static Predicate<MethodInfo>[] _validators = new Predicate<MethodInfo>[]
     {
         IsValidOutputSolution,
         IsValidInputSolution
     };
-
 
     internal static IEnumerable<MethodInfo> RetrieveValidSolutionMethods(this object container) => container.GetType().GetMethods().Where(IsValidSolutionMethod);
     static bool IsValidSolutionMethod(MethodInfo method)

@@ -24,43 +24,43 @@ public class TestSolutionMethodDiscovering
     }
     public static IEnumerable<object[]> ConstructorsOfContainersWithValidSolutionMethods = new List<Action[]>()
     {
-        new Action[] { () => SolutionTesterConstructorProvider.For<OutputSolution>() },
-        new Action[] { () => SolutionTesterConstructorProvider.For<InputSolution>() }
+        new Action[] { () => SolutionTesterConstructorProvider.For<OutputSolution, int>() },
+        new Action[] { () => SolutionTesterConstructorProvider.For<InputSolution, int>() }
     };
 
     [Fact]
     public void ShouldThrowEntryPointNotFoundException_WhenNoSolutionMethodsWereDiscovered()
     {
-        Assert.Throws<EntryPointNotFoundException>(SolutionTesterConstructorProvider.For<IgnoredSolutionMethods>());
+        Assert.Throws<EntryPointNotFoundException>(SolutionTesterConstructorProvider.For<IgnoredSolutionMethods, int>());
     }
 
     [Fact]
     public void ShouldThrowAmbiguousMatchException_WhenMultipleSolutionMethodsWereDiscovered()
     {
-        Assert.Throws<AmbiguousMatchException>(SolutionTesterConstructorProvider.For<MultipleSolutionMethods>());
+        Assert.Throws<AmbiguousMatchException>(SolutionTesterConstructorProvider.For<MultipleSolutionMethods, int>());
     }
 
     [Fact]
     public void ShouldThrowAmbiguousMatchException_WhenBothAttributeApplied()
     {
-        Assert.Throws<AmbiguousMatchException>(SolutionTesterConstructorProvider.For<InputAndOutputSolutions>());
+        Assert.Throws<AmbiguousMatchException>(SolutionTesterConstructorProvider.For<InputAndOutputSolutions, int>());
     }
 
     [Fact]
     public void ShouldThrowAmbiguousMatchException_WhenMultipleResultAttributesApplied()
     {
-        Assert.Throws<AmbiguousMatchException>(SolutionTesterConstructorProvider.For<MultipleInputSolutionAttributes>());
+        Assert.Throws<AmbiguousMatchException>(SolutionTesterConstructorProvider.For<MultipleInputSolutionAttributes, int>());
     }
 
     [Fact]
     public void ShouldThrowFormatException_WhenSolutionProviderReturnsVoid()
     {
-        Assert.Throws<FormatException>(SolutionTesterConstructorProvider.For<OutputSolutionWrongType>());
+        Assert.Throws<FormatException>(SolutionTesterConstructorProvider.For<OutputSolutionWrongType, int>());
     }
 
     [Fact]
     public void ShouldThrowFormatException_WhenResultProviderDoesNotReturnVoid()
     {
-        Assert.Throws<FormatException>(SolutionTesterConstructorProvider.For<InputSolutionWrongType>());
+        Assert.Throws<FormatException>(SolutionTesterConstructorProvider.For<InputSolutionWrongType, int>());
     }
 }

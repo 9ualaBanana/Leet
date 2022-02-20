@@ -10,11 +10,11 @@ public class TestArgumentsValidation
     [MemberData(nameof(DifferentTypeArguments))]
     public void ShouldThrowArgumentException_WhenArgumentsOfWrongTypePassed(object argument)
     {
-        var solutionMethod = SolutionTesterConstructorProvider.For<InputSolution>().Invoke().Test;
+        var solutionMethod = SolutionTesterConstructorProvider.For<InputSolution, int>().Invoke().Test;
         var solutionMethodParameterType = solutionMethod.Method.GetParameters()[0].ParameterType;
         if (solutionMethodParameterType == argument.GetType()) return;
 
-        Assert.Throws<ArgumentException>(() => solutionMethod(null!, new object[] { argument }));
+        Assert.Throws<ArgumentException>(() => solutionMethod(default(int), new object[] { argument }));
     }
     public static IEnumerable<object[]> DifferentTypeArguments
     {
@@ -33,8 +33,8 @@ public class TestArgumentsValidation
     [Fact]
     public void ShouldThrowArgumentNullException_WhenNullArgumentsProvided()
     {
-        var solutionMethod = SolutionTesterConstructorProvider.For<InputSolution>().Invoke().Test;
-        Assert.Throws<ArgumentNullException>(() => solutionMethod(null!, null));
-        Assert.Throws<ArgumentNullException>(() => solutionMethod(null!, new object[] { null, null }));
+        var solutionMethod = SolutionTesterConstructorProvider.For<InputSolution, int>().Invoke().Test;
+        Assert.Throws<ArgumentNullException>(() => solutionMethod(default(int), null));
+        Assert.Throws<ArgumentNullException>(() => solutionMethod(default(int), new object[] { null, null }));
     }
 }
