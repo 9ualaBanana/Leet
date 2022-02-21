@@ -17,9 +17,11 @@ internal class InputSolution<TResult> : SolutionMethod<TResult>
 
     protected override object? RetrieveSolutionMethodSpecificResult(object? _)
     {
+        Guard.Against.Null(Arguments, nameof(Arguments), "Arguments can't be null for InputSolution.");
+
         var resultParameterPosition = _method.GetParameters()
-            .Single(parameter => parameter.IsDefined(typeof(ResultAttribute))).Position;
-        // Arguments are never null for InputSolution.
-        return Arguments![resultParameterPosition];
+            .Single(parameter => parameter.IsDefined(typeof(ResultAttribute)))
+            .Position;
+        return Arguments[resultParameterPosition];
     }
 }

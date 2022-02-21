@@ -14,8 +14,8 @@ internal class OutputSolution<TResult> : SolutionMethod<TResult>
     {
     }
 
-    protected override object? RetrieveSolutionMethodSpecificResult(object? rawResult)
+    protected override object? RetrieveSolutionMethodSpecificResult(object? methodInfoResult)
     {
-        return rawResult;
+        return methodInfoResult;
     }
 }

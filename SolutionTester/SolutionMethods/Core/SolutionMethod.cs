@@ -5,15 +5,15 @@ namespace CCHelper;
 internal abstract class SolutionMethod<TResult>
 {
     readonly object _solutionContainer;
-    readonly protected MethodInfo _method;
     object[]? _arguments;
+    TResult? _result;
 
+    readonly protected MethodInfo _method;
     protected object[]? Arguments
     {
         get => _arguments;
         set => _arguments = new ArgumentsProcessor(_method, value).Process();
     }
-    TResult? Result { get; set; }
 
     protected SolutionMethod(MethodInfo method, object solutionContainer, Predicate<MethodInfo> validator)
     {
@@ -24,35 +24,35 @@ internal abstract class SolutionMethod<TResult>
     }
     void Validate(MethodInfo method, Predicate<MethodInfo> validator)
     {
-        if (validator is null) throw new NotImplementedException($"Validation logic is not implemented/provided" +
-            $" for the {this.GetType()}", new NullReferenceException());
-        if (!validator(method)) throw new InvalidOperationException($"Wrong method was identified as {this.GetType()}");
+        Guard.Against.Null(validator,
+            nameof(validator), "Validation logic is not implemented/provided for the {this.GetType()}");
+
+        if (!validator(method))
+        {
+            throw new InvalidOperationException($"Wrong method was identified as {this.GetType()}");
+        }
     }
 
     internal TResult? Invoke(object[] arguments)
     {
         Arguments = arguments;
-        var rawResult = _method.Invoke(_solutionContainer, Arguments);
-        SetResult(rawResult);
-        return Result;
+        var methodInfoResult = _method.Invoke(_solutionContainer, Arguments);
+        SetResult(methodInfoResult);
+        return _result;
     }
 
-    protected void SetResult(object? rawResult)
+    protected void SetResult(object? methodInfoResult)
     {
-        var result = RetrieveSolutionMethodSpecificResult(rawResult);
-        ValidateResult(result);
-
-        Result = (TResult)result!;
+        var result = RetrieveSolutionMethodSpecificResult(methodInfoResult);
+        _result = ValidateResult(result);
     }
-    protected abstract object? RetrieveSolutionMethodSpecificResult(object? rawResult);
-    void ValidateResult(object? result)
+    protected abstract object? RetrieveSolutionMethodSpecificResult(object? methodInfoResult);
+    static TResult ValidateResult(object? result)
     {
-        if (result is null) throw new ArgumentNullException(nameof(result), "Result can't be null.");
-        if (result.GetType() != typeof(TResult))
-        {
-            throw new InvalidCastException($"Type provided in place of {nameof(TResult)} ({typeof(TResult)})" +
-                $" doesn't match the actual type of the solution method ({result.GetType()})");
-        }
+        Guard.Against.Null(result, nameof(result));
+        Guard.Against.ResultTypeMismatch<TResult>(result, nameof(result));
+
+        return (TResult)result;
     }
 
     class ArgumentsProcessor
@@ -60,58 +60,53 @@ internal abstract class SolutionMethod<TResult>
         const object[]? EMPTY_ARGUMENTS = null;
 
         readonly MethodInfo _method;
-        object?[]? _arguments;
+        object[] _arguments;
 
         internal ArgumentsProcessor(MethodInfo method, object?[]? arguments)
         {
+            _arguments = Guard.Against.NullArguments(arguments, nameof(arguments));
             _method = method;
-            _arguments = arguments;
         }
 
         internal object[]? Process()
         {
-            if (NoArgumentsPassed) return EMPTY_ARGUMENTS;
+            if (NoArgumentsWerePassed) return EMPTY_ARGUMENTS;
 
-            ForbidNullArguments();
-            FormatArguments();
-            ValidateNumberOfArguments();
-            ValidateTypes();
-            return _arguments!;
+            ValidateArguments();
+            return _arguments;
         }
-        // arguments.Length == 0 when a client passes no arguments to `params object[]` parameter of the tester interface.
-        bool NoArgumentsPassed => _arguments?.Length == 0;
+        bool NoArgumentsWerePassed => _arguments.Length == 0;
 
-        void ForbidNullArguments()
+        void ValidateArguments()
         {
-            if (_arguments is null || _arguments.Any(argument => argument is null))
-            {
-                throw new ArgumentNullException("argument", "null arguments are currently not supported.");
-            }
+            ValidateArgumentsFormat();
+            ValidateArgumentsNumber();
+            ValidateArgumentsTypes();
         }
 
-        void FormatArguments()
+        void ValidateArgumentsFormat()
         {
-            if (ArgumentsWereMisinterpreted) FixArgumentsFormat();
+            if (ArgumentsFormatWasMisinterpreted) FixArgumentsFormat();
         }
-        bool ArgumentsWereMisinterpreted => _arguments!.GetType() != typeof(object[]);
+        bool ArgumentsFormatWasMisinterpreted => _arguments.GetType() != typeof(object[]);
         void FixArgumentsFormat()
         {
             _arguments = new object[] { _arguments! };
         }
 
-        void ValidateNumberOfArguments()
+        void ValidateArgumentsNumber()
         {
-            if (_arguments!.Length != _method.GetParameters().Length)
+            if (_arguments.Length != _method.GetParameters().Length)
             {
                 throw new TargetParameterCountException("Number of arguments doesn't match the number of parameters.");
             }
         }
 
-        void ValidateTypes()
+        void ValidateArgumentsTypes()
         {
             foreach (var parameter in _method.GetParameters())
             {
-                var correspondingArgumentType = _arguments![parameter.Position]!.GetType();
+                var correspondingArgumentType = _arguments[parameter.Position].GetType();
                 if (!parameter.ParameterType.IsAssignableFrom(correspondingArgumentType))
                 {
                     throw new ArgumentException($"Parameter [{parameter.ParameterType}] `{parameter.Name}` can't" +
