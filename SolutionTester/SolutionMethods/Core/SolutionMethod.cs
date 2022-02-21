@@ -60,7 +60,7 @@ internal abstract class SolutionMethod<TResult>
         const object[]? EMPTY_ARGUMENTS = null;
 
         readonly MethodInfo _method;
-        readonly object?[]? _arguments;
+        object?[]? _arguments;
 
         internal ArgumentsProcessor(MethodInfo method, object?[]? arguments)
         {
@@ -73,6 +73,7 @@ internal abstract class SolutionMethod<TResult>
             if (NoArgumentsPassed) return EMPTY_ARGUMENTS;
 
             ForbidNullArguments();
+            FormatArguments();
             ValidateNumberOfArguments();
             ValidateTypes();
             return _arguments!;
@@ -86,6 +87,16 @@ internal abstract class SolutionMethod<TResult>
             {
                 throw new ArgumentNullException("argument", "null arguments are currently not supported.");
             }
+        }
+
+        void FormatArguments()
+        {
+            if (ArgumentsWereMisinterpreted) FixArgumentsFormat();
+        }
+        bool ArgumentsWereMisinterpreted => _arguments!.GetType() != typeof(object[]);
+        void FixArgumentsFormat()
+        {
+            _arguments = new object[] { _arguments! };
         }
 
         void ValidateNumberOfArguments()
