@@ -12,7 +12,7 @@ internal static class SolutionMethodValidator
         IsValidInputSolution
     };
 
-    internal static IEnumerable<MethodInfo> RetrieveValidSolutionMethods(this object container) => container.GetType().GetMethods().Where(IsValidSolutionMethod);
+    internal static IEnumerable<MethodInfo> FindValidSolutionMethods(this object container) => container.GetType().GetMethods().Where(IsValidSolutionMethod);
     static bool IsValidSolutionMethod(MethodInfo method)
     {
         return _validators.Any(isValid => isValid(method));

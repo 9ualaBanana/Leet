@@ -9,7 +9,7 @@ internal static class SolutionMethodDiscovererFactory
         var singleSolutionMethod = solutionContainer.DiscoverSolutionMethod();
         if (singleSolutionMethod.IsOutputSolution()) return new OutputSolution<TResult>(singleSolutionMethod, solutionContainer);
         if (singleSolutionMethod.IsInputSolution()) return new InputSolution<TResult>(singleSolutionMethod, solutionContainer);
-        throw new ApplicationException("Something went wrong when trying to detect the solution method.");
+        throw new ApplicationException("Discovered solution method doesn't match with any known implementation.");
     }
     static MethodInfo DiscoverSolutionMethod(this object container)
     {
@@ -17,7 +17,7 @@ internal static class SolutionMethodDiscovererFactory
     }
     static MethodInfo GetSingleSolutionInContainerOrThrow(object container)
     {
-        var validSolutionMethods = container.RetrieveValidSolutionMethods();
+        var validSolutionMethods = container.FindValidSolutionMethods();
 
         if (!validSolutionMethods.Any()) throw new EntryPointNotFoundException("Solution method was not found inside the provided solution container.");
         if (validSolutionMethods.Count() > 1) throw new AmbiguousMatchException("Solution container must contain exactly one solution method.");

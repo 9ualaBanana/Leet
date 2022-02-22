@@ -6,7 +6,6 @@ internal abstract class SolutionMethod<TResult>
 {
     readonly object _solutionContainer;
     object[]? _arguments;
-    TResult? _result;
 
     readonly protected MethodInfo _method;
     protected object[]? Arguments
@@ -25,7 +24,7 @@ internal abstract class SolutionMethod<TResult>
     void Validate(MethodInfo method, Predicate<MethodInfo> validator)
     {
         Guard.Against.Null(validator,
-            nameof(validator), "Validation logic is not implemented/provided for the {this.GetType()}");
+            nameof(validator), $"Validation logic is not implemented/provided for {this.GetType()}.");
 
         if (!validator(method))
         {
@@ -33,19 +32,14 @@ internal abstract class SolutionMethod<TResult>
         }
     }
 
-    internal TResult? Invoke(object[] arguments)
+    internal TResult Invoke(object[] arguments)
     {
         Arguments = arguments;
         var methodInfoResult = _method.Invoke(_solutionContainer, Arguments);
-        SetResult(methodInfoResult);
-        return _result;
+        var result = RetrieveSolutionMethodSpecificResult(methodInfoResult);
+        return ValidateResult(result);
     }
 
-    protected void SetResult(object? methodInfoResult)
-    {
-        var result = RetrieveSolutionMethodSpecificResult(methodInfoResult);
-        _result = ValidateResult(result);
-    }
     protected abstract object? RetrieveSolutionMethodSpecificResult(object? methodInfoResult);
     static TResult ValidateResult(object? result)
     {
@@ -86,9 +80,9 @@ internal abstract class SolutionMethod<TResult>
 
         void ValidateArgumentsFormat()
         {
-            if (ArgumentsFormatWasMisinterpreted) FixArgumentsFormat();
+            if (ArgumentsUnwrapped) FixArgumentsFormat();
         }
-        bool ArgumentsFormatWasMisinterpreted => _arguments.GetType() != typeof(object[]);
+        bool ArgumentsUnwrapped => _arguments.GetType() != typeof(object[]);
         void FixArgumentsFormat()
         {
             _arguments = new object[] { _arguments! };
@@ -107,7 +101,7 @@ internal abstract class SolutionMethod<TResult>
             foreach (var parameter in _method.GetParameters())
             {
                 var correspondingArgumentType = _arguments[parameter.Position].GetType();
-                if (!parameter.ParameterType.IsAssignableFrom(correspondingArgumentType))
+                if (!correspondingArgumentType.IsAssignableTo(parameter.ParameterType))
                 {
                     throw new ArgumentException($"Parameter [{parameter.ParameterType}] `{parameter.Name}` can't" +
                         $" be assigned the value of type [{correspondingArgumentType}] of the corresponding argument.");
