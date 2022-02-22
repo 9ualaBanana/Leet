@@ -2,6 +2,10 @@
 
 namespace CCHelper;
 
+/// <summary>
+/// The base class that is inherited by concrete solution method implementations.
+/// </summary>
+/// <typeparam name="TResult">type of the solution result.</typeparam>
 internal abstract class SolutionMethod<TResult>
 {
     readonly object _solutionContainer;
@@ -82,7 +86,19 @@ internal abstract class SolutionMethod<TResult>
         {
             if (ArgumentsUnwrapped) FixArgumentsFormat();
         }
+        /// <summary>
+        /// The argument passed as a jagged array got unwrapped by <c>`params object[]`</c>.
+        /// </summary>
+        /// <remarks>
+        /// Corrupts the actual number of passed arguments.
+        /// </remarks>
         bool ArgumentsUnwrapped => _arguments.GetType() != typeof(object[]);
+        /// <summary>
+        /// Wraps arguments back in <c>object[]</c>.
+        /// </summary>
+        /// <remarks>
+        /// Results in the correct number of arguments.
+        /// </remarks>
         void FixArgumentsFormat()
         {
             _arguments = new object[] { _arguments! };

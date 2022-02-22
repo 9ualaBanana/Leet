@@ -1,7 +1,10 @@
 ﻿using System.Reflection;
 
 namespace CCHelper;
-// InputSolution and OutputSolution contain their corresponding attribute definition, solution method validation logic and result setting logic.
+
+/// <summary>
+/// Labels a solution method that provides the result in its return value.
+/// </summary>
 [AttributeUsage(AttributeTargets.Method, Inherited = false)]
 public class SolutionAttribute : Attribute
 {
