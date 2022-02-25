@@ -20,8 +20,8 @@ internal static class SolutionMethodValidator
 
     internal static bool IsValidOutputSolution(this MethodInfo method)
     {
-        bool hasSolutionAttribute = method.IsOutputSolution();
-        bool hasResultAttribute = method.IsInputSolution();
+        bool hasSolutionAttribute = method.IsLabeledWithSolutionAttribute();
+        bool hasResultAttribute = method.IsLabeledWithResultAttribute();
         bool hasCorrectReturnType = method.ReturnType != typeof(void);
 
         if (hasSolutionAttribute && hasResultAttribute) throw new AmbiguousMatchException("Solution method must be labeled with exactly one attribute.");
@@ -29,7 +29,7 @@ internal static class SolutionMethodValidator
 
         return hasSolutionAttribute && hasCorrectReturnType;
     }
-    internal static bool IsOutputSolution(this MethodInfo method)
+    internal static bool IsLabeledWithSolutionAttribute(this MethodInfo method)
     {
         return method.IsDefined(typeof(SolutionAttribute));
     }
@@ -40,7 +40,7 @@ internal static class SolutionMethodValidator
             Where(parameter => parameter.CustomAttributes.
             Any(attribute => attribute.AttributeType == typeof(ResultAttribute))).Count();
         // No check for parameters presence is needed, as [Result] attribute can only be applied to parameters and that implies there is at least one.
-        bool hasSolutionAttribute = method.IsOutputSolution();
+        bool hasSolutionAttribute = method.IsLabeledWithSolutionAttribute();
         bool hasCorrectReturnType = method.ReturnType == typeof(void);
 
         if (hasSolutionAttribute && resultAttributesCount > 0) throw new AmbiguousMatchException("Solution method must be labeled with exactly one attribute.");
@@ -49,7 +49,7 @@ internal static class SolutionMethodValidator
 
         return resultAttributesCount == 1;
     }
-    internal static bool IsInputSolution(this MethodInfo method)
+    internal static bool IsLabeledWithResultAttribute(this MethodInfo method)
     {
         return method.GetParameters().Any(parameter => parameter.IsDefined(typeof(ResultAttribute)));
     }

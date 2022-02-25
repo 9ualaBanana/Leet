@@ -9,9 +9,6 @@ public class SolutionTester<TSolutionContainer, TResult> where TSolutionContaine
 {
     readonly SolutionMethod<TResult> _solutionMethod;
 
-    TResult? _actualResult;
-    TResult? _expectedResult;
-
     /// <summary>
     /// Instantiates the tester for a solution method defined inside <typeparamref name="TSolutionContainer"/>.
     /// </summary>
@@ -36,14 +33,8 @@ public class SolutionTester<TSolutionContainer, TResult> where TSolutionContaine
 
     public void Test(TResult expectedResult, params object[] arguments)
     {
-        _expectedResult = expectedResult;
-        _actualResult = _solutionMethod.Invoke(arguments);
+        var actualResult = _solutionMethod.Invoke(arguments);
 
-        OutputResults();
-    }
-    void OutputResults()
-    {
-        Console.WriteLine($"Expected result: {_expectedResult}");
-        Console.WriteLine($"Actual result: {_actualResult}");
+        new SolutionResultPresenter(expectedResult!, actualResult!).DisplayResults();
     }
 }

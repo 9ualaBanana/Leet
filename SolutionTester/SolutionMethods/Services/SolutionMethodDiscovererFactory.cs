@@ -7,8 +7,8 @@ internal static class SolutionMethodDiscovererFactory
     internal static SolutionMethod<TResult> SearchSolutionContainer<TResult>(object solutionContainer)
     {
         var singleSolutionMethod = solutionContainer.DiscoverSolutionMethod();
-        if (singleSolutionMethod.IsOutputSolution()) return new OutputSolution<TResult>(singleSolutionMethod, solutionContainer);
-        if (singleSolutionMethod.IsInputSolution()) return new InputSolution<TResult>(singleSolutionMethod, solutionContainer);
+        if (singleSolutionMethod.IsLabeledWithSolutionAttribute()) return new OutputSolution<TResult>(singleSolutionMethod, solutionContainer);
+        if (singleSolutionMethod.IsLabeledWithResultAttribute()) return new InputSolution<TResult>(singleSolutionMethod, solutionContainer);
         throw new ApplicationException("Discovered solution method doesn't match with any known implementation.");
     }
     static MethodInfo DiscoverSolutionMethod(this object container)
