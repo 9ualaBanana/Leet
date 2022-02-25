@@ -1,40 +1,40 @@
-﻿using System.Reflection;
+﻿namespace CCHelper;
 
-namespace CCHelper;
-
-public class SolutionTester<Solution> where Solution : new()
+/// <summary>
+/// Provides an interface for testing solution methods.
+/// </summary>
+/// <typeparam name="TSolutionContainer">the type where the solution method is defined.</typeparam>
+/// <typeparam name="TResult">the result type of the solution method.</typeparam>
+public class SolutionTester<TSolutionContainer, TResult> where TSolutionContainer : class, new()
 {
-    readonly Solution _solution = new();
-    MethodInfo? _solutionMethod;
+    readonly SolutionMethod<TResult> _solutionMethod;
 
-    // These are null in case the solution method returns void.
-    object? _actualResult;
-    object? _expectedResult;
-
-    MethodInfo _SolutionMethod
+    /// <summary>
+    /// Instantiates the tester for a solution method defined inside <typeparamref name="TSolutionContainer"/>.
+    /// </summary>
+    /// <remarks>
+    /// The solution method must have a public access modifier.
+    /// </remarks>
+    public SolutionTester() : this(new TSolutionContainer())
     {
-        get
-        {
-            if (_solutionMethod is not null) return _solutionMethod;
-
-            var methods = _solution.GetType().GetMethods().Where(method => Attribute.GetCustomAttribute(method, typeof(SolutionAttribute)) is not null);
-            if (methods.Count() == 0) throw new MissingMethodException("None of the methods is labeled as the solution.");
-            if (methods.Count() > 1) throw new AmbiguousMatchException("Exactly one method needs to be labeled as the solution.");
-            return _solutionMethod = methods.ToList()[0];
-        }
     }
 
-    public void Test(object[] arguments, object expectedResult)
+    /// <summary>
+    /// Instantiates the tester for a solution method defined inside <paramref name="solutionContainer"/>.
+    /// </summary>
+    /// <remarks>
+    /// The solution method must have a public access modifier.
+    /// </remarks>
+    /// <param name="solutionContainer">the instance of <typeparamref name="TSolutionContainer"/> where the solution method is defined.</param>
+    public SolutionTester(TSolutionContainer solutionContainer)
     {
-        _expectedResult = expectedResult;
-        _actualResult = _SolutionMethod.Invoke(_solution, arguments);
-        _expectedResult = Convert.ChangeType(_expectedResult, _SolutionMethod.ReturnType);
-        _actualResult = Convert.ChangeType(_actualResult, _SolutionMethod.ReturnType);
-        OutputResults();
+        _solutionMethod = SolutionMethodDiscovererFactory.SearchSolutionContainer<TResult>(solutionContainer);
     }
-    void OutputResults()
+
+    public void Test(TResult expectedResult, params object[] arguments)
     {
-        Console.WriteLine($"Expected result: {_expectedResult}");
-        Console.WriteLine($"Actual result: {_actualResult}");
+        var actualResult = _solutionMethod.Invoke(arguments);
+
+        new SolutionResultPresenter(expectedResult!, actualResult!).DisplayResults();
     }
 }
