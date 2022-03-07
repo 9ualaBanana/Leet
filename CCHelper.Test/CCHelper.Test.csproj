@@ -20,8 +20,4 @@
     </PackageReference>
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\SolutionTester\SolutionTester.csproj" />
-  </ItemGroup>
-
 </Project>
