@@ -1,4 +1,7 @@
-﻿namespace CCHelper;
+﻿using CCHelper.Core;
+using CCHelper.Services;
+
+namespace CCHelper;
 
 /// <summary>
 /// Provides an interface for testing solution methods.
@@ -28,13 +31,13 @@ public class SolutionTester<TSolutionContainer, TResult> where TSolutionContaine
     /// <param name="solutionContainer">the instance of <typeparamref name="TSolutionContainer"/> where the solution method is defined.</param>
     public SolutionTester(TSolutionContainer solutionContainer)
     {
-        _solutionMethod = SolutionMethodDiscovererFactory.SearchSolutionContainer<TResult>(solutionContainer);
+        _solutionMethod = SolutionMethodDiscoverer.SearchSolutionContainer<TResult>(solutionContainer);
     }
 
-    public void Test(TResult expectedResult, params object[] arguments)
+    public void Test(TResult expectedResult, params object?[]? arguments)
     {
         var actualResult = _solutionMethod.Invoke(arguments);
 
-        new SolutionResultPresenter(expectedResult!, actualResult!).DisplayResults();
+        //new SolutionResultPresenter(expectedResult!, actualResult!).DisplayResults();
     }
 }

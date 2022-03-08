@@ -1,20 +1,15 @@
 ﻿using System.Reflection;
 
-namespace CCHelper;
-
-/// <summary>
-/// Labels a solution method that provides the result in its return value.
-/// </summary>
-[AttributeUsage(AttributeTargets.Method, Inherited = false)]
-public class SolutionAttribute : Attribute
-{
-}
+namespace CCHelper.Core;
 
 internal class OutputSolution<TResult> : SolutionMethod<TResult>
 {
+    protected override Type ResultType => _method.ReturnType;
+
     internal OutputSolution(MethodInfo method, object solutionContainer) 
-        : base(method, solutionContainer, SolutionMethodValidator.IsValidOutputSolution)
+        : base(method, solutionContainer)
     {
+        EnsureResultsTypesCompatibility();
     }
 
     protected override object? RetrieveSolutionMethodSpecificResult(object? methodInfoResult)

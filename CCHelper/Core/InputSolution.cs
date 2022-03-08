@@ -1,30 +1,22 @@
 ﻿using System.Reflection;
 
-namespace CCHelper;
-
-/// <summary>
-/// Labels a solution method that provides its result in one of the arguments.
-/// </summary>
-[AttributeUsage(AttributeTargets.Parameter, Inherited = false)]
-public class ResultAttribute : Attribute
-{
-}
-
+namespace CCHelper.Core;
 
 internal class InputSolution<TResult> : SolutionMethod<TResult>
 {
+    readonly ParameterInfo _resultParameter;
+    protected override Type ResultType => _resultParameter.ParameterType;
+
     internal InputSolution(MethodInfo method, object solutionContainer) 
-        : base(method, solutionContainer, SolutionMethodValidator.IsValidInputSolution) 
+        : base(method, solutionContainer) 
     {
+        _resultParameter = _method.GetParameters()
+            .Single(parameter => parameter.IsDefined(typeof(ResultAttribute)));
+        EnsureResultsTypesCompatibility();
     }
 
     protected override object? RetrieveSolutionMethodSpecificResult(object? _)
     {
-        Guard.Against.Null(Arguments, nameof(Arguments), "Arguments can't be null for InputSolution.");
-
-        var resultParameterPosition = _method.GetParameters()
-            .Single(parameter => parameter.IsDefined(typeof(ResultAttribute)))
-            .Position;
-        return Arguments[resultParameterPosition];
+        return Arguments![_resultParameter.Position];
     }
 }
