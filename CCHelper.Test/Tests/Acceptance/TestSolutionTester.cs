@@ -10,29 +10,33 @@ using Xunit;
 
 namespace CCHelper.Test.Tests.Acceptance;
 
-public class TestSolutionTester : DynamicContextClient
+public class TestSolutionTester : DynamicContextFixture
 {
-    Action SolutionTesterConstructor(Type tResult)
+    Action SUT_SolutionTesterConstructor<TResult>(TResult _)
     {
-        var solutionTesterType = typeof(SolutionTester<,>).MakeGenericType(_context.SolutionContainer.Type, tResult);
-        var constructor = solutionTesterType.GetConstructor(Type.EmptyTypes)!;
-        return () => constructor.Invoke(BindingFlags.DoNotWrapExceptions, null, null, null);
+        static void callConstructor<TSolutionContainer>(TSolutionContainer solutionContainer)
+            where TSolutionContainer : class, new() =>
+            new SolutionTester<TSolutionContainer, TResult>(solutionContainer);
+        // Must call the constructor with the dynamically pre-instantiated SolutionContainer.Instance.
+        // The default constructor instantiates a new TSolutionContainer object statically which won't work.
+
+        return () => callConstructor(_context.SolutionContainer.Instance);
     }
 
     [Theory]
     [MemberData(nameof(ValidSolutionMethods))]
-    public void ShouldNotThrow_WhenSolutionContainerDefinesValidSolutionMethod(SolutionMethodStub solutionMethodStub)
+    public void WhenSolutionContainerDefinesValidSolutionMethod_ShouldNotThrow(SolutionMethodStub solutionMethodStub)
     {
         solutionMethodStub.PutInContext(_context);
 
-        Assert.True(SolutionTesterConstructor(TypeData.DummyType).DoesNotThrow());
+        Assert.True(SUT_SolutionTesterConstructor(TypeData.DummyValue).DoesNotThrow());
     }
 
     [Theory]
     [InlineData(AccessModifier.Internal)]
     [InlineData(AccessModifier.Protected)]
     [InlineData(AccessModifier.Private)]
-    public void ShouldThrowEntryPointNotFoundException_WhenNoSolutionMethodsWereDiscovered(AccessModifier accessModifier)
+    public void WhenNoSolutionMethodsWereDiscovered_ShouldThrow(AccessModifier accessModifier)
     {
         SolutionMethodStub
             .NewStub
@@ -43,11 +47,11 @@ public class TestSolutionTester : DynamicContextClient
             .Returning(TypeData.DummyType)
             .PutInContext(_context);
 
-        Assert.Throws<EntryPointNotFoundException>(SolutionTesterConstructor(TypeData.DummyType));
+        Assert.Throws<EntryPointNotFoundException>(SUT_SolutionTesterConstructor(TypeData.DummyType));
     }
 
     [Fact]
-    public void ShouldThrowAmbiguousMatchException_WhenMultipleSolutionMethodsWereDiscovered()
+    public void WhenMultipleSolutionMethodsWereDiscovered_ShouldThrow()
     {
         SolutionMethodStub
             .NewStub
@@ -61,11 +65,11 @@ public class TestSolutionTester : DynamicContextClient
             .Returning(typeof(void))
             .PutInContext(_context);
 
-        Assert.Throws<AmbiguousMatchException>(SolutionTesterConstructor(TypeData.DummyType));
+        Assert.Throws<AmbiguousMatchException>(SUT_SolutionTesterConstructor(TypeData.DummyType));
     }
 
     [Fact]
-    public void ShouldThrowAmbiguousMatchException_WhenBothAttributesApplied()
+    public void WhenBothAttributesApplied_ShouldThrow()
     {
         SolutionMethodStub
             .NewStub
@@ -75,11 +79,11 @@ public class TestSolutionTester : DynamicContextClient
             .Returning(TypeData.DummyType)
             .PutInContext(_context);
 
-        Assert.Throws<AmbiguousMatchException>(SolutionTesterConstructor(TypeData.DummyType));
+        Assert.Throws<AmbiguousMatchException>(SUT_SolutionTesterConstructor(TypeData.DummyType));
     }
 
     [Fact]
-    public void ShouldThrowAmbiguousMatchException_WhenMultipleResultAttributesApplied()
+    public void WhenMultipleResultAttributesApplied_ShouldThrow()
     {
         SolutionMethodStub
             .NewStub
@@ -88,11 +92,11 @@ public class TestSolutionTester : DynamicContextClient
             .Returning(typeof(void))
             .PutInContext(_context);
 
-        Assert.Throws<AmbiguousMatchException>(SolutionTesterConstructor(TypeData.DummyType));
+        Assert.Throws<AmbiguousMatchException>(SUT_SolutionTesterConstructor(TypeData.DummyType));
     }
 
     [Fact]
-    public void ShouldThrowFormatException_WhenOutputSolutionReturnsVoid()
+    public void WhenOutputSolutionReturnsVoid_ShouldThrow()
     {
         SolutionMethodStub
             .NewStub
@@ -100,21 +104,21 @@ public class TestSolutionTester : DynamicContextClient
             .Returning(typeof(void))
             .PutInContext(_context);
 
-        Assert.Throws<FormatException>(SolutionTesterConstructor(TypeData.DummyType));
+        Assert.Throws<FormatException>(SUT_SolutionTesterConstructor(TypeData.DummyType));
     }
 
     [Theory]
     [MemberData(nameof(TypeData.Types), MemberType = typeof(TypeData))]
-    public void ShouldThrowFormatException_WhenInputSolutionDoesNotReturnVoid(Type nonVoidType)
+    public void WhenInputSolutionDoesNotReturnVoid_ShouldThrow(Type nonVoidType)
     {
         SolutionMethodStub
             .NewStub
             .Accepting(TypeData.DummyType)
-            .Returning(nonVoidType)
             .WithResultLabelAppliedToParameter(1)
+            .Returning(nonVoidType)
             .PutInContext(_context);
 
-        Assert.Throws<FormatException>(SolutionTesterConstructor(TypeData.DummyType));
+        Assert.Throws<FormatException>(SUT_SolutionTesterConstructor(TypeData.DummyValue));
     }
 
     public static IEnumerable<object[]> ValidSolutionMethods

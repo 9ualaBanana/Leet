@@ -6,6 +6,7 @@ namespace CCHelper.Test.Framework.TestData;
 public static class TypeData
 {
     internal static Type DummyType = typeof(int);
+    internal static int DummyValue = default;
 
     public static IEnumerable<object[]> Types
     {

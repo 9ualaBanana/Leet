@@ -9,7 +9,6 @@ internal static class SolutionMethodDiscoverer
     {
         var singleSolutionMethod = solutionContainer.DiscoverSolutionMethod<TResult>();
         return SolutionMethodFactory.Create<TResult>(singleSolutionMethod, solutionContainer);
-
     }
     static MethodInfo DiscoverSolutionMethod<TResult>(this object container)
     {
@@ -19,9 +18,19 @@ internal static class SolutionMethodDiscoverer
     {
         var validSolutionMethods = container.FindValidSolutionMethods();
 
-        if (!validSolutionMethods.Any()) throw new EntryPointNotFoundException("Solution method was not found inside the provided solution container.");
-        if (validSolutionMethods.Count() > 1) throw new AmbiguousMatchException("Solution container must contain exactly one solution method.");
+        if (!validSolutionMethods.Any())
+        {
+            throw new EntryPointNotFoundException("Solution method was not found inside the provided solution container.");
+        }
+        if (validSolutionMethods.Count() > 1)
+        {
+            throw new AmbiguousMatchException("Solution container must contain exactly one solution method.");
+        }
 
         return validSolutionMethods.Single();
+    }
+    static IEnumerable<MethodInfo> FindValidSolutionMethods(this object container)
+    {
+        return container.GetType().GetMethods().Where(SolutionMethodValidator.IsValidSolutionMethod);
     }
 }

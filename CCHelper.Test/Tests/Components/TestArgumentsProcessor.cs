@@ -10,16 +10,16 @@ using Xunit;
 
 namespace CCHelper.Test.Tests.Components;
 
-public class TestArgumentsProcessor : DynamicContextClient
+public class TestArgumentsProcessor : DynamicContextFixture
 {
-    Action ProcessArguments(params object?[]? arguments)
+    Action SUT_ProcessArguments(params object?[]? arguments)
     {
-        return () => new ArgumentsProcessor(_context.SolutionContainer.DefinedMethods[0], arguments).Process();
+        return () => new ArgumentsProcessor(_context.SolutionContainer.DefinedMethod, arguments).Process();
     }
 
     [Theory]
     [MemberData(nameof(TypeData.DefaultValues), MemberType = typeof(TypeData))]
-    public void ShouldThrowArgumentException_WhenArgumentsOfWrongTypePassed(object argument)
+    public void WhenArgumentsOfWrongTypePassed_ShouldThrow(object argument)
     {
         Type parameterType = typeof(int);
         if (argument.GetType() == parameterType) return;
@@ -31,13 +31,13 @@ public class TestArgumentsProcessor : DynamicContextClient
             .Returning(TypeData.DummyType)
             .PutInContext(_context);
 
-        Assert.Throws<ArgumentException>(ProcessArguments(argument));
+        Assert.Throws<ArgumentException>(SUT_ProcessArguments(argument));
     }
 
     [Theory]
     [InlineData(new object[] { new Type[] { typeof(int?) } })]
     [InlineData(new object[] { new Type[] { typeof(bool?), typeof(double?) } })]
-    public void ShouldAcceptNullArguments_WhenCorrespondingParametersAreNullableTypes(Type[] parametersTypes)
+    public void WhenCorrespondingParametersAreNullableTypes_ShouldAcceptNullArguments(Type[] parametersTypes)
     {
         SolutionMethodStub
             .NewStub
@@ -46,13 +46,13 @@ public class TestArgumentsProcessor : DynamicContextClient
             .Returning(TypeData.DummyType)
             .PutInContext(_context);
 
-        Assert.True(ProcessArguments(GetNullArguments(parametersTypes.Length)).DoesNotThrow());
+        Assert.True(SUT_ProcessArguments(GetNullArguments(parametersTypes.Length)).DoesNotThrow());
     }
 
     [Theory]
     [InlineData(new object[] { new Type[] { typeof(string) } })]
     [InlineData(new object[] { new Type[] { typeof(string), typeof(object) } })]
-    public void ShouldAcceptNullArguments_WhenCorrespondingParametersAreReferenceTypes(Type[] parametersTypes)
+    public void WhenCorrespondingParametersAreReferenceTypes_ShouldAcceptNullArguments(Type[] parametersTypes)
     {
         SolutionMethodStub
             .NewStub
@@ -61,11 +61,11 @@ public class TestArgumentsProcessor : DynamicContextClient
             .Returning(TypeData.DummyType)
             .PutInContext(_context);
 
-        Assert.True(ProcessArguments(GetNullArguments(parametersTypes.Length)).DoesNotThrow());
+        Assert.True(SUT_ProcessArguments(GetNullArguments(parametersTypes.Length)).DoesNotThrow());
     }
 
     [Fact]
-    public void ShouldAcceptEmptyArguments_WhenSolutionMethodHasNoParameters()
+    public void WhenSolutionMethodHasNoParameters_ShouldAcceptEmptyArguments()
     {
         SolutionMethodStub
             .NewStub
@@ -73,12 +73,12 @@ public class TestArgumentsProcessor : DynamicContextClient
             .Returning(TypeData.DummyType)
             .PutInContext(_context);
 
-        Assert.True(ProcessArguments(EmptyArgumentsList).DoesNotThrow());
+        Assert.True(SUT_ProcessArguments(EmptyArgumentsList).DoesNotThrow());
     }
 
     [Theory]
     [MemberData(nameof(TypeData.DefaultValues), MemberType = typeof(TypeData))]
-    public void ShouldAcceptArguments_WhenPassedAsSeparateElements(object value)
+    public void WhenArgumentsPassedAsSeparateElements_ShouldWrapThem(object value)
     {
         SolutionMethodStub
             .NewStub
@@ -87,13 +87,13 @@ public class TestArgumentsProcessor : DynamicContextClient
             .Returning(TypeData.DummyType)
             .PutInContext(_context);
 
-        Assert.True(ProcessArguments(value, value).DoesNotThrow());
+        Assert.True(SUT_ProcessArguments(value, value).DoesNotThrow());
     }
 
     [Theory]
     [InlineData(new object[] { new int[] { default } })]
     [InlineData(new object[] { new int[] { default, default, default } })]
-    public void ShouldHandleArrayArguments_WhenParamsUnwrapsThem(object arguments)
+    public void WhenParamsUnwrapsArrayArguments_ShouldWrapThem(object arguments)
     {
         SolutionMethodStub
             .NewStub
@@ -102,7 +102,7 @@ public class TestArgumentsProcessor : DynamicContextClient
             .Returning(TypeData.DummyType)
             .PutInContext(_context);
 
-        Assert.True(ProcessArguments(arguments).DoesNotThrow());
+        Assert.True(SUT_ProcessArguments(arguments).DoesNotThrow());
     }
 
     [Theory]
@@ -110,7 +110,7 @@ public class TestArgumentsProcessor : DynamicContextClient
     [InlineData(1, 0)]
     [InlineData(1, 2)]
     [InlineData(4, 3)]
-    public void ShouldThrowTargetParameterCountException_WhenWrongNumberOfArgumentsPassed(int parametersCount, int argumentsCount)
+    public void WhenWrongNumberOfArgumentsPassed_ShouldThrow(int parametersCount, int argumentsCount)
     {
         var dummyParameters = new Type[parametersCount];
         Array.Fill(dummyParameters, TypeData.DummyType);
@@ -123,11 +123,11 @@ public class TestArgumentsProcessor : DynamicContextClient
             .Returning(TypeData.DummyType)
             .PutInContext(_context);
 
-        Assert.Throws<TargetParameterCountException>(ProcessArguments(dummyArguments));
+        Assert.Throws<TargetParameterCountException>(SUT_ProcessArguments(dummyArguments));
     }
 
     [Fact]
-    public void ShouldThrowTargetParameterCountException_WhenNoArgumentsPassedToInputSolution()
+    public void WhenNoArgumentsPassedToInputSolution_ShouldThrow()
     {
         SolutionMethodStub
             .NewStub
@@ -136,14 +136,14 @@ public class TestArgumentsProcessor : DynamicContextClient
             .Returning(typeof(void))
             .PutInContext(_context);
 
-        Assert.Throws<TargetParameterCountException>(ProcessArguments(EmptyArgumentsList));
+        Assert.Throws<TargetParameterCountException>(SUT_ProcessArguments(EmptyArgumentsList));
     }
 
     [Theory(Skip = "Obsolete. null arguments used to be not allowed.")]
     [InlineData(new object[] { null! })]
     [InlineData(new object[] { new object[] { null!, null! } })]
     [InlineData(new object[] { new object[] { default(int), null! } })]
-    public void ShouldThrowArgumentNullException_WhenNullArgumentsProvided(object[] arguments)
+    public void WhenNullArgumentsPassed_ShouldThrow(object[] arguments)
     {
         SolutionMethodStub
             .NewStub
@@ -152,7 +152,7 @@ public class TestArgumentsProcessor : DynamicContextClient
             .Returning(TypeData.DummyType)
             .PutInContext(_context);
 
-        Assert.Throws<ArgumentNullException>(ProcessArguments(arguments));
+        Assert.Throws<ArgumentNullException>(SUT_ProcessArguments(arguments));
     }
 
     /// <summary>

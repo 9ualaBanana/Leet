@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Text;
 
-namespace CCHelper;
+namespace CCHelper.Services;
 
 internal class SolutionResultPresenter
 {
