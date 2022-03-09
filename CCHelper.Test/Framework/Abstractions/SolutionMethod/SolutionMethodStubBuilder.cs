@@ -52,7 +52,6 @@ internal class SolutionMethodStubBuilder
             nameof(_product.Parameters), "Formal parameters must be provided before applying attributes to them.");
 
         _product.ResultAttributesPositions = parameterPositions;
-        _product.ReturnType = typeof(void);
         return this;
     }
 

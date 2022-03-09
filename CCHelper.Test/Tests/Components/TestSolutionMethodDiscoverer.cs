@@ -51,6 +51,7 @@ public class TestSolutionMethodDiscoverer : DynamicContextFixture
             .NewStub
             .Accepting(TypeData.DummyType)
             .WithResultLabelAppliedToParameter(1)
+            .Returning(typeof(void))
             .PutInContext(_context);
 
         Assert.Throws<AmbiguousMatchException>(SUT_SearchSolutionContainer(TypeData.DummyType));

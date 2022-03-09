@@ -12,11 +12,15 @@ namespace CCHelper.Test.Tests.Acceptance;
 
 public class TestSolutionTester : DynamicContextFixture
 {
-    Action SUT_SolutionTesterConstructor(Type tResult)
+    Action SUT_SolutionTesterConstructor<TResult>(TResult _)
     {
-        var solutionTesterType = typeof(SolutionTester<,>).MakeGenericType(_context.SolutionContainer.Type, tResult);
-        var constructor = solutionTesterType.GetConstructor(Type.EmptyTypes)!;
-        return () => constructor.Invoke(BindingFlags.DoNotWrapExceptions, null, null, null);
+        static void callConstructor<TSolutionContainer>(TSolutionContainer solutionContainer)
+            where TSolutionContainer : class, new() =>
+            new SolutionTester<TSolutionContainer, TResult>(solutionContainer);
+        // Must call the constructor with the dynamically pre-instantiated SolutionContainer.Instance.
+        // The default constructor instantiates a new TSolutionContainer object statically which won't work.
+
+        return () => callConstructor(_context.SolutionContainer.Instance);
     }
 
     [Theory]
@@ -25,7 +29,7 @@ public class TestSolutionTester : DynamicContextFixture
     {
         solutionMethodStub.PutInContext(_context);
 
-        Assert.True(SUT_SolutionTesterConstructor(TypeData.DummyType).DoesNotThrow());
+        Assert.True(SUT_SolutionTesterConstructor(TypeData.DummyValue).DoesNotThrow());
     }
 
     [Theory]
@@ -110,11 +114,11 @@ public class TestSolutionTester : DynamicContextFixture
         SolutionMethodStub
             .NewStub
             .Accepting(TypeData.DummyType)
-            .Returning(nonVoidType)
             .WithResultLabelAppliedToParameter(1)
+            .Returning(nonVoidType)
             .PutInContext(_context);
 
-        Assert.Throws<FormatException>(SUT_SolutionTesterConstructor(TypeData.DummyType));
+        Assert.Throws<FormatException>(SUT_SolutionTesterConstructor(TypeData.DummyValue));
     }
 
     public static IEnumerable<object[]> ValidSolutionMethods
