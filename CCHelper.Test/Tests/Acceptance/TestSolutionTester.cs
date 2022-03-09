@@ -25,7 +25,7 @@ public class TestSolutionTester : DynamicContextFixture
 
     [Theory]
     [MemberData(nameof(ValidSolutionMethods))]
-    public void ShouldNotThrow_WhenSolutionContainerDefinesValidSolutionMethod(SolutionMethodStub solutionMethodStub)
+    public void WhenSolutionContainerDefinesValidSolutionMethod_ShouldNotThrow(SolutionMethodStub solutionMethodStub)
     {
         solutionMethodStub.PutInContext(_context);
 
@@ -36,7 +36,7 @@ public class TestSolutionTester : DynamicContextFixture
     [InlineData(AccessModifier.Internal)]
     [InlineData(AccessModifier.Protected)]
     [InlineData(AccessModifier.Private)]
-    public void ShouldThrowEntryPointNotFoundException_WhenNoSolutionMethodsWereDiscovered(AccessModifier accessModifier)
+    public void WhenNoSolutionMethodsWereDiscovered_ShouldThrow(AccessModifier accessModifier)
     {
         SolutionMethodStub
             .NewStub
@@ -51,7 +51,7 @@ public class TestSolutionTester : DynamicContextFixture
     }
 
     [Fact]
-    public void ShouldThrowAmbiguousMatchException_WhenMultipleSolutionMethodsWereDiscovered()
+    public void WhenMultipleSolutionMethodsWereDiscovered_ShouldThrow()
     {
         SolutionMethodStub
             .NewStub
@@ -69,7 +69,7 @@ public class TestSolutionTester : DynamicContextFixture
     }
 
     [Fact]
-    public void ShouldThrowAmbiguousMatchException_WhenBothAttributesApplied()
+    public void WhenBothAttributesApplied_ShouldThrow()
     {
         SolutionMethodStub
             .NewStub
@@ -83,7 +83,7 @@ public class TestSolutionTester : DynamicContextFixture
     }
 
     [Fact]
-    public void ShouldThrowAmbiguousMatchException_WhenMultipleResultAttributesApplied()
+    public void WhenMultipleResultAttributesApplied_ShouldThrow()
     {
         SolutionMethodStub
             .NewStub
@@ -96,7 +96,7 @@ public class TestSolutionTester : DynamicContextFixture
     }
 
     [Fact]
-    public void ShouldThrowFormatException_WhenOutputSolutionReturnsVoid()
+    public void WhenOutputSolutionReturnsVoid_ShouldThrow()
     {
         SolutionMethodStub
             .NewStub
@@ -109,7 +109,7 @@ public class TestSolutionTester : DynamicContextFixture
 
     [Theory]
     [MemberData(nameof(TypeData.Types), MemberType = typeof(TypeData))]
-    public void ShouldThrowFormatException_WhenInputSolutionDoesNotReturnVoid(Type nonVoidType)
+    public void WhenInputSolutionDoesNotReturnVoid_ShouldThrow(Type nonVoidType)
     {
         SolutionMethodStub
             .NewStub

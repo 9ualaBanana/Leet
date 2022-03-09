@@ -17,7 +17,7 @@ public class TestSolutionMethodDiscoverer : DynamicContextFixture
     }
 
     [Fact]
-    public void ShouldNotThrow_WhenSolutionMethodIsDiscovered()
+    public void WhenSolutionMethodIsDiscovered_ShouldNotThrow()
     {
         SolutionMethodStub
             .NewStub
@@ -29,7 +29,7 @@ public class TestSolutionMethodDiscoverer : DynamicContextFixture
     }
 
     [Fact]
-    public void ShouldThrowEntryPointNotFoundException_WhenSolutionContainerHasNoSolutionMethods()
+    public void WhenSolutionContainerHasNoSolutionMethods_ShouldThrow()
     {
         SolutionMethodStub
             .NewStub
@@ -40,7 +40,7 @@ public class TestSolutionMethodDiscoverer : DynamicContextFixture
     }
 
     [Fact]
-    public void ShouldThrowAmbiguousMatchException_WhenSolutionContainerHasMultipleSolutionMethods()
+    public void WhenSolutionContainerHasMultipleSolutionMethods_ShouldThrow()
     {
         SolutionMethodStub
             .NewStub

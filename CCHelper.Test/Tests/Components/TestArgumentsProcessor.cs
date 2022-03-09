@@ -19,7 +19,7 @@ public class TestArgumentsProcessor : DynamicContextFixture
 
     [Theory]
     [MemberData(nameof(TypeData.DefaultValues), MemberType = typeof(TypeData))]
-    public void ShouldThrowArgumentException_WhenArgumentsOfWrongTypePassed(object argument)
+    public void WhenArgumentsOfWrongTypePassed_ShouldThrow(object argument)
     {
         Type parameterType = typeof(int);
         if (argument.GetType() == parameterType) return;
@@ -37,7 +37,7 @@ public class TestArgumentsProcessor : DynamicContextFixture
     [Theory]
     [InlineData(new object[] { new Type[] { typeof(int?) } })]
     [InlineData(new object[] { new Type[] { typeof(bool?), typeof(double?) } })]
-    public void ShouldAcceptNullArguments_WhenCorrespondingParametersAreNullableTypes(Type[] parametersTypes)
+    public void WhenCorrespondingParametersAreNullableTypes_ShouldAcceptNullArguments(Type[] parametersTypes)
     {
         SolutionMethodStub
             .NewStub
@@ -52,7 +52,7 @@ public class TestArgumentsProcessor : DynamicContextFixture
     [Theory]
     [InlineData(new object[] { new Type[] { typeof(string) } })]
     [InlineData(new object[] { new Type[] { typeof(string), typeof(object) } })]
-    public void ShouldAcceptNullArguments_WhenCorrespondingParametersAreReferenceTypes(Type[] parametersTypes)
+    public void WhenCorrespondingParametersAreReferenceTypes_ShouldAcceptNullArguments(Type[] parametersTypes)
     {
         SolutionMethodStub
             .NewStub
@@ -65,7 +65,7 @@ public class TestArgumentsProcessor : DynamicContextFixture
     }
 
     [Fact]
-    public void ShouldAcceptEmptyArguments_WhenSolutionMethodHasNoParameters()
+    public void WhenSolutionMethodHasNoParameters_ShouldAcceptEmptyArguments()
     {
         SolutionMethodStub
             .NewStub
@@ -78,7 +78,7 @@ public class TestArgumentsProcessor : DynamicContextFixture
 
     [Theory]
     [MemberData(nameof(TypeData.DefaultValues), MemberType = typeof(TypeData))]
-    public void ShouldAcceptArguments_WhenPassedAsSeparateElements(object value)
+    public void WhenArgumentsPassedAsSeparateElements_ShouldWrapThem(object value)
     {
         SolutionMethodStub
             .NewStub
@@ -93,7 +93,7 @@ public class TestArgumentsProcessor : DynamicContextFixture
     [Theory]
     [InlineData(new object[] { new int[] { default } })]
     [InlineData(new object[] { new int[] { default, default, default } })]
-    public void ShouldHandleArrayArguments_WhenParamsUnwrapsThem(object arguments)
+    public void WhenParamsUnwrapsArrayArguments_ShouldWrapThem(object arguments)
     {
         SolutionMethodStub
             .NewStub
@@ -110,7 +110,7 @@ public class TestArgumentsProcessor : DynamicContextFixture
     [InlineData(1, 0)]
     [InlineData(1, 2)]
     [InlineData(4, 3)]
-    public void ShouldThrowTargetParameterCountException_WhenWrongNumberOfArgumentsPassed(int parametersCount, int argumentsCount)
+    public void WhenWrongNumberOfArgumentsPassed_ShouldThrow(int parametersCount, int argumentsCount)
     {
         var dummyParameters = new Type[parametersCount];
         Array.Fill(dummyParameters, TypeData.DummyType);
@@ -127,7 +127,7 @@ public class TestArgumentsProcessor : DynamicContextFixture
     }
 
     [Fact]
-    public void ShouldThrowTargetParameterCountException_WhenNoArgumentsPassedToInputSolution()
+    public void WhenNoArgumentsPassedToInputSolution_ShouldThrow()
     {
         SolutionMethodStub
             .NewStub
@@ -143,7 +143,7 @@ public class TestArgumentsProcessor : DynamicContextFixture
     [InlineData(new object[] { null! })]
     [InlineData(new object[] { new object[] { null!, null! } })]
     [InlineData(new object[] { new object[] { default(int), null! } })]
-    public void ShouldThrowArgumentNullException_WhenNullArgumentsProvided(object[] arguments)
+    public void WhenNullArgumentsPassed_ShouldThrow(object[] arguments)
     {
         SolutionMethodStub
             .NewStub
