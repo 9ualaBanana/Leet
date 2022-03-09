@@ -10,9 +10,9 @@ using Xunit;
 
 namespace CCHelper.Test.Tests.Acceptance;
 
-public class TestSolutionTester : DynamicContextClient
+public class TestSolutionTester : DynamicContextFixture
 {
-    Action SolutionTesterConstructor(Type tResult)
+    Action SUT_SolutionTesterConstructor(Type tResult)
     {
         var solutionTesterType = typeof(SolutionTester<,>).MakeGenericType(_context.SolutionContainer.Type, tResult);
         var constructor = solutionTesterType.GetConstructor(Type.EmptyTypes)!;
@@ -25,7 +25,7 @@ public class TestSolutionTester : DynamicContextClient
     {
         solutionMethodStub.PutInContext(_context);
 
-        Assert.True(SolutionTesterConstructor(TypeData.DummyType).DoesNotThrow());
+        Assert.True(SUT_SolutionTesterConstructor(TypeData.DummyType).DoesNotThrow());
     }
 
     [Theory]
@@ -43,7 +43,7 @@ public class TestSolutionTester : DynamicContextClient
             .Returning(TypeData.DummyType)
             .PutInContext(_context);
 
-        Assert.Throws<EntryPointNotFoundException>(SolutionTesterConstructor(TypeData.DummyType));
+        Assert.Throws<EntryPointNotFoundException>(SUT_SolutionTesterConstructor(TypeData.DummyType));
     }
 
     [Fact]
@@ -61,7 +61,7 @@ public class TestSolutionTester : DynamicContextClient
             .Returning(typeof(void))
             .PutInContext(_context);
 
-        Assert.Throws<AmbiguousMatchException>(SolutionTesterConstructor(TypeData.DummyType));
+        Assert.Throws<AmbiguousMatchException>(SUT_SolutionTesterConstructor(TypeData.DummyType));
     }
 
     [Fact]
@@ -75,7 +75,7 @@ public class TestSolutionTester : DynamicContextClient
             .Returning(TypeData.DummyType)
             .PutInContext(_context);
 
-        Assert.Throws<AmbiguousMatchException>(SolutionTesterConstructor(TypeData.DummyType));
+        Assert.Throws<AmbiguousMatchException>(SUT_SolutionTesterConstructor(TypeData.DummyType));
     }
 
     [Fact]
@@ -88,7 +88,7 @@ public class TestSolutionTester : DynamicContextClient
             .Returning(typeof(void))
             .PutInContext(_context);
 
-        Assert.Throws<AmbiguousMatchException>(SolutionTesterConstructor(TypeData.DummyType));
+        Assert.Throws<AmbiguousMatchException>(SUT_SolutionTesterConstructor(TypeData.DummyType));
     }
 
     [Fact]
@@ -100,7 +100,7 @@ public class TestSolutionTester : DynamicContextClient
             .Returning(typeof(void))
             .PutInContext(_context);
 
-        Assert.Throws<FormatException>(SolutionTesterConstructor(TypeData.DummyType));
+        Assert.Throws<FormatException>(SUT_SolutionTesterConstructor(TypeData.DummyType));
     }
 
     [Theory]
@@ -114,7 +114,7 @@ public class TestSolutionTester : DynamicContextClient
             .WithResultLabelAppliedToParameter(1)
             .PutInContext(_context);
 
-        Assert.Throws<FormatException>(SolutionTesterConstructor(TypeData.DummyType));
+        Assert.Throws<FormatException>(SUT_SolutionTesterConstructor(TypeData.DummyType));
     }
 
     public static IEnumerable<object[]> ValidSolutionMethods

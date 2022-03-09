@@ -10,9 +10,9 @@ using Xunit;
 
 namespace CCHelper.Test.Tests.Components;
 
-public class TestArgumentsProcessor : DynamicContextClient
+public class TestArgumentsProcessor : DynamicContextFixture
 {
-    Action ProcessArguments(params object?[]? arguments)
+    Action SUT_ProcessArguments(params object?[]? arguments)
     {
         return () => new ArgumentsProcessor(_context.SolutionContainer.DefinedMethods[0], arguments).Process();
     }
@@ -31,7 +31,7 @@ public class TestArgumentsProcessor : DynamicContextClient
             .Returning(TypeData.DummyType)
             .PutInContext(_context);
 
-        Assert.Throws<ArgumentException>(ProcessArguments(argument));
+        Assert.Throws<ArgumentException>(SUT_ProcessArguments(argument));
     }
 
     [Theory]
@@ -46,7 +46,7 @@ public class TestArgumentsProcessor : DynamicContextClient
             .Returning(TypeData.DummyType)
             .PutInContext(_context);
 
-        Assert.True(ProcessArguments(GetNullArguments(parametersTypes.Length)).DoesNotThrow());
+        Assert.True(SUT_ProcessArguments(GetNullArguments(parametersTypes.Length)).DoesNotThrow());
     }
 
     [Theory]
@@ -61,7 +61,7 @@ public class TestArgumentsProcessor : DynamicContextClient
             .Returning(TypeData.DummyType)
             .PutInContext(_context);
 
-        Assert.True(ProcessArguments(GetNullArguments(parametersTypes.Length)).DoesNotThrow());
+        Assert.True(SUT_ProcessArguments(GetNullArguments(parametersTypes.Length)).DoesNotThrow());
     }
 
     [Fact]
@@ -73,7 +73,7 @@ public class TestArgumentsProcessor : DynamicContextClient
             .Returning(TypeData.DummyType)
             .PutInContext(_context);
 
-        Assert.True(ProcessArguments(EmptyArgumentsList).DoesNotThrow());
+        Assert.True(SUT_ProcessArguments(EmptyArgumentsList).DoesNotThrow());
     }
 
     [Theory]
@@ -87,7 +87,7 @@ public class TestArgumentsProcessor : DynamicContextClient
             .Returning(TypeData.DummyType)
             .PutInContext(_context);
 
-        Assert.True(ProcessArguments(value, value).DoesNotThrow());
+        Assert.True(SUT_ProcessArguments(value, value).DoesNotThrow());
     }
 
     [Theory]
@@ -102,7 +102,7 @@ public class TestArgumentsProcessor : DynamicContextClient
             .Returning(TypeData.DummyType)
             .PutInContext(_context);
 
-        Assert.True(ProcessArguments(arguments).DoesNotThrow());
+        Assert.True(SUT_ProcessArguments(arguments).DoesNotThrow());
     }
 
     [Theory]
@@ -123,7 +123,7 @@ public class TestArgumentsProcessor : DynamicContextClient
             .Returning(TypeData.DummyType)
             .PutInContext(_context);
 
-        Assert.Throws<TargetParameterCountException>(ProcessArguments(dummyArguments));
+        Assert.Throws<TargetParameterCountException>(SUT_ProcessArguments(dummyArguments));
     }
 
     [Fact]
@@ -136,7 +136,7 @@ public class TestArgumentsProcessor : DynamicContextClient
             .Returning(typeof(void))
             .PutInContext(_context);
 
-        Assert.Throws<TargetParameterCountException>(ProcessArguments(EmptyArgumentsList));
+        Assert.Throws<TargetParameterCountException>(SUT_ProcessArguments(EmptyArgumentsList));
     }
 
     [Theory(Skip = "Obsolete. null arguments used to be not allowed.")]
@@ -152,7 +152,7 @@ public class TestArgumentsProcessor : DynamicContextClient
             .Returning(TypeData.DummyType)
             .PutInContext(_context);
 
-        Assert.Throws<ArgumentNullException>(ProcessArguments(arguments));
+        Assert.Throws<ArgumentNullException>(SUT_ProcessArguments(arguments));
     }
 
     /// <summary>

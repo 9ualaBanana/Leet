@@ -9,7 +9,6 @@ internal static class SolutionMethodDiscoverer
     {
         var singleSolutionMethod = solutionContainer.DiscoverSolutionMethod<TResult>();
         return SolutionMethodFactory.Create<TResult>(singleSolutionMethod, solutionContainer);
-
     }
     static MethodInfo DiscoverSolutionMethod<TResult>(this object container)
     {

@@ -1,4 +1,5 @@
 ﻿using Ardalis.GuardClauses;
+using CCHelper.Core;
 using CCHelper.Test.Framework.Abstractions.SolutionContext;
 using System;
 using System.Reflection;
@@ -41,12 +42,17 @@ internal class SolutionMethodStubBuilder
         }
     }
 
+    /// <remarks>
+    /// Also sets the appopriate for <see cref="InputSolution{TResult}"/> return type.
+    /// </remarks>
+    /// <param name="parameterPositions">the positions of parameters (starting from 1) to which the label will be applied .</param>
     internal SolutionMethodStubBuilder WithResultLabelAppliedToParameter(params int[] parameterPositions)
     {
         Guard.Against.Null(_product.Parameters,
             nameof(_product.Parameters), "Formal parameters must be provided before applying attributes to them.");
 
         _product.ResultAttributesPositions = parameterPositions;
+        _product.ReturnType = typeof(void);
         return this;
     }
 
