@@ -5,7 +5,6 @@ VisualStudioVersion = 17.0.32112.339
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CCHelper.Test", "CCHelper.Test\CCHelper.Test.csproj", "{57F9948C-1748-4C72-AA5A-56022505D753}"
 EndProject
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CCHelper", "CCHelper\CCHelper.csproj", "{47DFAD14-C234-4767-A209-E1B819DE7415}"
 EndProject
 Global

@@ -1,42 +1,34 @@
 ﻿using System.Reflection;
 
-namespace CCHelper.Services;
+namespace CCHelper.Services.ArgumentsProcessor;
 
 internal class ArgumentsProcessor
 {
     const object[]? EMPTY_ARGUMENTS = null;
+    readonly static IArgumentsFormat[] _supportedFormats =
+    {
+        new UnwrappedArguments()
+    };
 
     readonly MethodInfo _method;
     readonly object?[] _arguments;
 
     internal ArgumentsProcessor(MethodInfo method, object?[]? arguments)
     {
-        _arguments = ArgumentsInCorrectFormat(arguments);
+        _arguments = NormalizedArguments(arguments);
         _method = method;
     }
-    static object?[] ArgumentsInCorrectFormat(object?[]? arguments)
+    static object?[] NormalizedArguments(object?[]? arguments)
     {
-        return ArgumentsMisinterpreted(arguments) ? FixArgumentsFormat(arguments) : arguments!;
-    }
-    /// <summary>
-    /// The single <c>null</c> argument or the argument passed as a jagged array got unwrapped by <c>params object[]</c>.
-    /// </summary>
-    /// <remarks>
-    /// Corrupts the actual number of passed arguments.
-    /// </remarks>
-    static bool ArgumentsMisinterpreted(object?[]? arguments)
-    {
-        return arguments is null || arguments.GetType() != typeof(object[]);
-    }
-    /// <summary>
-    /// Wraps arguments back in <c>object[]</c>.
-    /// </summary>
-    /// <remarks>
-    /// Results in the correct number of arguments.
-    /// </remarks>
-    static object?[] FixArgumentsFormat(object?[]? arguments)
-    {
-        return new object?[] { arguments };
+        foreach (var argumentsFormat in _supportedFormats)
+        {
+            if (argumentsFormat.Match(arguments))
+            {
+                argumentsFormat.Normalize(ref arguments);
+                break;
+            }
+        }
+        return arguments!;
     }
 
     internal object?[]? Process()

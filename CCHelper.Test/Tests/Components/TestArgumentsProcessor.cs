@@ -1,4 +1,4 @@
-﻿using CCHelper.Services;
+﻿using CCHelper.Services.ArgumentsProcessor;
 using CCHelper.Test.Framework;
 using CCHelper.Test.Framework.Abstractions.SolutionContext;
 using CCHelper.Test.Framework.Abstractions.SolutionMethod;
@@ -88,6 +88,19 @@ public class TestArgumentsProcessor : DynamicContextFixture
             .PutInContext(_context);
 
         Assert.True(SUT_ProcessArguments(value, value).DoesNotThrow());
+    }
+
+    [Fact]
+    public void WhenSingleNullArgumentPassed_ShouldWrapIt()
+    {
+        SolutionMethodStub
+            .NewStub
+            .WithSolutionLabel
+            .Accepting(typeof(object))
+            .Returning(TypeData.DummyType)
+            .PutInContext(_context);
+
+        Assert.True(SUT_ProcessArguments(null).DoesNotThrow());
     }
 
     [Theory]
