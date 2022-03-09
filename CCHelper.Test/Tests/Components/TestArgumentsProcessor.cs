@@ -14,7 +14,7 @@ public class TestArgumentsProcessor : DynamicContextFixture
 {
     Action SUT_ProcessArguments(params object?[]? arguments)
     {
-        return () => new ArgumentsProcessor(_context.SolutionContainer.DefinedMethods[0], arguments).Process();
+        return () => new ArgumentsProcessor(_context.SolutionContainer.DefinedMethod, arguments).Process();
     }
 
     [Theory]

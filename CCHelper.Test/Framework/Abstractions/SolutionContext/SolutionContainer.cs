@@ -15,6 +15,7 @@ public class SolutionContainer
     // because if MethodInfo is accessed in different way NotImplementedException is thrown
     // because of something related to a dynamic module.
     internal MethodInfo[] DefinedMethods => Type.GetMethods();
+    internal MethodInfo DefinedMethod => DefinedMethods[0];
 
     internal SolutionContainer(Type type)
     {

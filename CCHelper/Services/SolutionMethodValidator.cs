@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace CCHelper;
+namespace CCHelper.Services;
 
 internal static class SolutionMethodValidator
 {
@@ -15,16 +15,12 @@ internal static class SolutionMethodValidator
         IsValidInputSolution
     };
 
-    internal static IEnumerable<MethodInfo> FindValidSolutionMethods(this object container)
+    internal static bool IsValidSolutionMethod(MethodInfo methodInfo)
     {
-        return container.GetType().GetMethods().Where(IsValidSolutionMethod);
-    }
-    static bool IsValidSolutionMethod(MethodInfo method)
-    {
-        return _validators.Any(isValid => isValid(method));
+        return _validators.Any(isValid => isValid(methodInfo));
     }
 
-    internal static bool IsValidOutputSolution(this MethodInfo methodInfo)
+    static bool IsValidOutputSolution(this MethodInfo methodInfo)
     {
         bool hasSolutionLabel = methodInfo.HasSolutionLabel();
         bool hasResultLabel = methodInfo.HasResultLabel();
@@ -40,7 +36,7 @@ internal static class SolutionMethodValidator
         return methodInfo.IsDefined(typeof(SolutionAttribute));
     }
 
-    internal static bool IsValidInputSolution(this MethodInfo methodInfo)
+    static bool IsValidInputSolution(this MethodInfo methodInfo)
     {
         int resultLabelsCount = methodInfo.GetParameters().
             Where(parameter => parameter.CustomAttributes.
