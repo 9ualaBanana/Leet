@@ -1,5 +1,4 @@
 ﻿using CCHelper.Services;
-using CCHelper.Test.Framework;
 using CCHelper.Test.Framework.Abstractions.SolutionContext;
 using CCHelper.Test.Framework.Abstractions.SolutionMethod;
 using CCHelper.Test.Framework.TestData;
@@ -25,7 +24,7 @@ public class TestSolutionMethodDiscoverer : DynamicContextFixture
             .Returning(TypeData.DummyType)
             .PutInContext(_context);
 
-        Assert.True(SUT_SearchSolutionContainer(TypeData.DummyValue).DoesNotThrow());
+        Assert.DoesNotThrow(SUT_SearchSolutionContainer(TypeData.DummyValue));
     }
 
     [Fact]

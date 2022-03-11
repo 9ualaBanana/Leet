@@ -1,5 +1,4 @@
 ﻿using CCHelper.Services.ArgumentsProcessor;
-using CCHelper.Test.Framework;
 using CCHelper.Test.Framework.Abstractions.SolutionContext;
 using CCHelper.Test.Framework.Abstractions.SolutionMethod;
 using CCHelper.Test.Framework.TestData;
@@ -46,7 +45,7 @@ public class TestArgumentsProcessor : DynamicContextFixture
             .Returning(TypeData.DummyType)
             .PutInContext(_context);
 
-        Assert.True(SUT_ProcessArguments(GetNullArguments(parametersTypes.Length)).DoesNotThrow());
+        Assert.DoesNotThrow(SUT_ProcessArguments(GetNullArguments(parametersTypes.Length)));
     }
 
     [Theory]
@@ -61,7 +60,7 @@ public class TestArgumentsProcessor : DynamicContextFixture
             .Returning(TypeData.DummyType)
             .PutInContext(_context);
 
-        Assert.True(SUT_ProcessArguments(GetNullArguments(parametersTypes.Length)).DoesNotThrow());
+        Assert.DoesNotThrow(SUT_ProcessArguments(GetNullArguments(parametersTypes.Length)));
     }
 
     [Fact]
@@ -73,7 +72,7 @@ public class TestArgumentsProcessor : DynamicContextFixture
             .Returning(TypeData.DummyType)
             .PutInContext(_context);
 
-        Assert.True(SUT_ProcessArguments(EmptyArgumentsList).DoesNotThrow());
+        Assert.DoesNotThrow(SUT_ProcessArguments(EmptyArgumentsList));
     }
 
     [Theory]
@@ -87,7 +86,7 @@ public class TestArgumentsProcessor : DynamicContextFixture
             .Returning(TypeData.DummyType)
             .PutInContext(_context);
 
-        Assert.True(SUT_ProcessArguments(value, value).DoesNotThrow());
+        Assert.DoesNotThrow(SUT_ProcessArguments(value, value));
     }
 
     [Fact]
@@ -100,7 +99,7 @@ public class TestArgumentsProcessor : DynamicContextFixture
             .Returning(TypeData.DummyType)
             .PutInContext(_context);
 
-        Assert.True(SUT_ProcessArguments(null).DoesNotThrow());
+        Assert.DoesNotThrow(SUT_ProcessArguments(null));
     }
 
     [Theory]
@@ -115,7 +114,7 @@ public class TestArgumentsProcessor : DynamicContextFixture
             .Returning(TypeData.DummyType)
             .PutInContext(_context);
 
-        Assert.True(SUT_ProcessArguments(arguments).DoesNotThrow());
+        Assert.DoesNotThrow(SUT_ProcessArguments(arguments));
     }
 
     [Theory]
