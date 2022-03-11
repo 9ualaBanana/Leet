@@ -8,8 +8,17 @@ internal class StringSequenceInterpreter
     readonly Brackets _brackets;
     const string _elementsCapturingGroup = "elements";
 
-    Regex SequenceRegex => new(
-        $@"\{_brackets.OpeningBracket}\s*(?<{_elementsCapturingGroup}>(?:[-+]?\d{{1,}},\s*)*[-+]?\d{{1,}})\s*\{_brackets.ClosingBracket}"
+    Regex? _sequenceRegex;
+    Regex SequenceRegex => _sequenceRegex ??= new(
+        $@"\{_brackets.OpeningBracket}\s*
+        (?<{_elementsCapturingGroup}>
+            (
+                (?<digit>[-+]?\d+)
+                (?<separator>,\s*)?
+            )*  # Wraps elemenets as an integral whole.
+        )
+        \s*{_brackets.ClosingBracket}",
+        RegexOptions.IgnorePatternWhitespace | RegexOptions.ExplicitCapture
         );
     MatchCollection? _parsedOutStringSequences;
     MatchCollection ParsedOutStringSequences
