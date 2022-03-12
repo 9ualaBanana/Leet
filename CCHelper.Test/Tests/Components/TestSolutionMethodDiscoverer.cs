@@ -15,8 +15,10 @@ public class TestSolutionMethodDiscoverer : DynamicContextFixture
         return () => SolutionMethodDiscoverer.SearchSolutionContainer<TResult>(_context.SolutionContainer.Instance);
     }
 
+
+
     [Fact]
-    public void WhenSolutionMethodIsDiscovered_ShouldNotThrow()
+    public void SUT_SolutionMethodInSolutionContainer_DoesNotThrow()
     {
         SolutionMethodStub
             .NewStub
@@ -24,11 +26,11 @@ public class TestSolutionMethodDiscoverer : DynamicContextFixture
             .Returning(TypeData.DummyType)
             .PutInContext(_context);
 
-        Assert.DoesNotThrow(SUT_SearchSolutionContainer(TypeData.DummyValue));
+        Assert.Null(Record.Exception(SUT_SearchSolutionContainer(TypeData.DummyValue)));
     }
 
     [Fact]
-    public void WhenSolutionContainerHasNoSolutionMethods_ShouldThrow()
+    public void SUT_NoSolutionMethodInSolutionContainer_Throws()
     {
         SolutionMethodStub
             .NewStub
@@ -39,7 +41,7 @@ public class TestSolutionMethodDiscoverer : DynamicContextFixture
     }
 
     [Fact]
-    public void WhenSolutionContainerHasMultipleSolutionMethods_ShouldThrow()
+    public void SUT_MultipleSolutionMethodsInSolutionContainer_Throws()
     {
         SolutionMethodStub
             .NewStub

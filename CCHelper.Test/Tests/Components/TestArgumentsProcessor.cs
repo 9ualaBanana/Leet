@@ -16,6 +16,56 @@ public class TestArgumentsProcessor : DynamicContextFixture
         return () => new ArgumentsProcessor(_context.SolutionContainer.DefinedMethod, arguments).Process();
     }
 
+
+
+    [Fact]
+    public void WhenSolutionMethodHasNoParameters_ShouldAcceptEmptyArguments()
+    {
+        SolutionMethodStub
+            .NewStub
+            .WithSolutionLabel
+            .Returning(TypeData.DummyType)
+            .PutInContext(_context);
+
+        Assert.Null(Record.Exception(SUT_ProcessArguments(EmptyArgumentsList)));
+    }
+
+    [Fact]
+    public void WhenNoArgumentsPassedToInputSolution_ShouldThrow()
+    {
+        SolutionMethodStub
+            .NewStub
+            .Accepting(TypeData.DummyType)
+            .WithResultLabelAppliedToParameter(1)
+            .Returning(typeof(void))
+            .PutInContext(_context);
+
+        Assert.Throws<TargetParameterCountException>(SUT_ProcessArguments(EmptyArgumentsList));
+    }
+
+    [Theory]
+    [InlineData(0, 1)]
+    [InlineData(1, 0)]
+    [InlineData(1, 2)]
+    [InlineData(4, 3)]
+    public void WhenWrongNumberOfArgumentsPassed_ShouldThrow(int parametersCount, int argumentsCount)
+    {
+        var dummyParameters = new Type[parametersCount];
+        Array.Fill(dummyParameters, TypeData.DummyType);
+        var dummyArguments = new object[argumentsCount];
+        Array.Fill(dummyArguments, new object());
+        SolutionMethodStub
+            .NewStub
+            .WithSolutionLabel
+            .Accepting(dummyParameters)
+            .Returning(TypeData.DummyType)
+            .PutInContext(_context);
+
+        Assert.Throws<TargetParameterCountException>(SUT_ProcessArguments(dummyArguments));
+    }
+
+
+
     [Theory]
     [MemberData(nameof(TypeData.DefaultValues), MemberType = typeof(TypeData))]
     public void WhenArgumentsOfWrongTypePassed_ShouldThrow(object argument)
@@ -45,7 +95,7 @@ public class TestArgumentsProcessor : DynamicContextFixture
             .Returning(TypeData.DummyType)
             .PutInContext(_context);
 
-        Assert.DoesNotThrow(SUT_ProcessArguments(GetNullArguments(parametersTypes.Length)));
+        Assert.Null(Record.Exception(SUT_ProcessArguments(GetNullArguments(parametersTypes.Length))));
     }
 
     [Theory]
@@ -60,47 +110,10 @@ public class TestArgumentsProcessor : DynamicContextFixture
             .Returning(TypeData.DummyType)
             .PutInContext(_context);
 
-        Assert.DoesNotThrow(SUT_ProcessArguments(GetNullArguments(parametersTypes.Length)));
+        Assert.Null(Record.Exception(SUT_ProcessArguments(GetNullArguments(parametersTypes.Length))));
     }
 
-    [Fact]
-    public void WhenSolutionMethodHasNoParameters_ShouldAcceptEmptyArguments()
-    {
-        SolutionMethodStub
-            .NewStub
-            .WithSolutionLabel
-            .Returning(TypeData.DummyType)
-            .PutInContext(_context);
 
-        Assert.DoesNotThrow(SUT_ProcessArguments(EmptyArgumentsList));
-    }
-
-    [Theory]
-    [MemberData(nameof(TypeData.DefaultValues), MemberType = typeof(TypeData))]
-    public void WhenArgumentsPassedAsSeparateElements_ShouldWrapThem(object value)
-    {
-        SolutionMethodStub
-            .NewStub
-            .WithSolutionLabel
-            .Accepting(value.GetType(), value.GetType())
-            .Returning(TypeData.DummyType)
-            .PutInContext(_context);
-
-        Assert.DoesNotThrow(SUT_ProcessArguments(value, value));
-    }
-
-    [Fact]
-    public void WhenSingleNullArgumentPassed_ShouldWrapIt()
-    {
-        SolutionMethodStub
-            .NewStub
-            .WithSolutionLabel
-            .Accepting(typeof(object))
-            .Returning(TypeData.DummyType)
-            .PutInContext(_context);
-
-        Assert.DoesNotThrow(SUT_ProcessArguments(null));
-    }
 
     [Theory]
     [InlineData(new object[] { new int[] { default } })]
@@ -114,58 +127,65 @@ public class TestArgumentsProcessor : DynamicContextFixture
             .Returning(TypeData.DummyType)
             .PutInContext(_context);
 
-        Assert.DoesNotThrow(SUT_ProcessArguments(arguments));
+        Assert.Null(Record.Exception(SUT_ProcessArguments(arguments)));
     }
 
     [Theory]
-    [InlineData(0, 1)]
-    [InlineData(1, 0)]
-    [InlineData(1, 2)]
-    [InlineData(4, 3)]
-    public void WhenWrongNumberOfArgumentsPassed_ShouldThrow(int parametersCount, int argumentsCount)
+    [MemberData(nameof(TypeData.DefaultValues), MemberType = typeof(TypeData))]
+    public void WhenArgumentsPassedAsSeparateElements_ShouldWrapThem(object value)
     {
-        var dummyParameters = new Type[parametersCount];
-        Array.Fill(dummyParameters, TypeData.DummyType);
-        var dummyArguments = new object[argumentsCount];
-        Array.Fill(dummyArguments, new object());
         SolutionMethodStub
             .NewStub
             .WithSolutionLabel
-            .Accepting(dummyParameters)
+            .Accepting(value.GetType(), value.GetType())
             .Returning(TypeData.DummyType)
             .PutInContext(_context);
 
-        Assert.Throws<TargetParameterCountException>(SUT_ProcessArguments(dummyArguments));
+        Assert.Null(Record.Exception(SUT_ProcessArguments(value, value)));
     }
 
     [Fact]
-    public void WhenNoArgumentsPassedToInputSolution_ShouldThrow()
-    {
-        SolutionMethodStub
-            .NewStub
-            .Accepting(TypeData.DummyType)
-            .WithResultLabelAppliedToParameter(1)
-            .Returning(typeof(void))
-            .PutInContext(_context);
-
-        Assert.Throws<TargetParameterCountException>(SUT_ProcessArguments(EmptyArgumentsList));
-    }
-
-    [Theory(Skip = "Obsolete. null arguments used to be not allowed.")]
-    [InlineData(new object[] { null! })]
-    [InlineData(new object[] { new object[] { null!, null! } })]
-    [InlineData(new object[] { new object[] { default(int), null! } })]
-    public void WhenNullArgumentsPassed_ShouldThrow(object[] arguments)
+    public void WhenSingleNullArgumentPassed_ShouldWrapIt()
     {
         SolutionMethodStub
             .NewStub
             .WithSolutionLabel
-            .Accepting(TypeData.DummyType, TypeData.DummyType)
+            .Accepting(typeof(object))
             .Returning(TypeData.DummyType)
             .PutInContext(_context);
 
-        Assert.Throws<ArgumentNullException>(SUT_ProcessArguments(arguments));
+        Assert.Null(Record.Exception(SUT_ProcessArguments(null)));
     }
+
+    [Theory]
+    [MemberData(nameof(StringSequenceData.NonJagged), MemberType = typeof(StringSequenceData))]
+    public void WhenNonJaggedStringSequenceArgumentPassed_ShouldInterpretIt(string stringSequence, int[] _)
+    {
+        SolutionMethodStub
+            .NewStub
+            .WithSolutionLabel
+            .Accepting(typeof(int[]))
+            .Returning(TypeData.DummyType)
+            .PutInContext(_context);
+
+        Assert.Null(Record.Exception(SUT_ProcessArguments(stringSequence)));
+    }
+    
+    [Theory]
+    [MemberData(nameof(StringSequenceData.Jagged), MemberType = typeof(StringSequenceData))]
+    public void WhenJaggedStringSequenceArgumentPassed_ShouldInterpretIt(string stringSequence, int[][] _)
+    {
+        SolutionMethodStub
+            .NewStub
+            .WithSolutionLabel
+            .Accepting(typeof(int[][]))
+            .Returning(TypeData.DummyType)
+            .PutInContext(_context);
+
+        Assert.Null(Record.Exception(SUT_ProcessArguments(stringSequence)));
+    }
+
+
 
     /// <summary>
     /// Imitates passing no arguments to the public interface that takes arguments in form of `params object[]`

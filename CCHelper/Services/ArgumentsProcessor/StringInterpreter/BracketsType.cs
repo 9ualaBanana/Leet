@@ -1,4 +1,4 @@
-﻿namespace CCHelper.Services.ArgumentsProcessor.StringSequenceInterpreter;
+﻿namespace CCHelper.Services.ArgumentsProcessor.StringInterpreter;
 
 internal enum BracketsType
 {

@@ -28,7 +28,7 @@ public class TestSolutionTester : DynamicContextFixture
     {
         solutionMethodStub.PutInContext(_context);
 
-        Assert.DoesNotThrow(SUT_SolutionTesterConstructor(TypeData.DummyValue));
+        Assert.Null(Record.Exception(SUT_SolutionTesterConstructor(TypeData.DummyValue)));
     }
 
     [Theory]
@@ -107,7 +107,7 @@ public class TestSolutionTester : DynamicContextFixture
     }
 
     [Theory]
-    [MemberData(nameof(TypeData.Types), MemberType = typeof(TypeData))]
+    [MemberData(nameof(TypeData.ValueTypes), MemberType = typeof(TypeData))]
     public void WhenInputSolutionDoesNotReturnVoid_ShouldThrow(Type nonVoidType)
     {
         SolutionMethodStub

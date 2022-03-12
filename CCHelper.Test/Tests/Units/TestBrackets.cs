@@ -1,5 +1,5 @@
 ﻿using Xunit;
-using CCHelper.Services.ArgumentsProcessor.StringSequenceInterpreter;
+using CCHelper.Services.ArgumentsProcessor.StringInterpreter;
 using System.Collections.Generic;
 using System;
 
@@ -9,7 +9,7 @@ public class TestBrackets
 {
     [Theory]
     [MemberData(nameof(BracketsTypes))]
-    internal void WhenBracketsAreSupported_ShouldReturnTrue(BracketsType bracketsType)
+    internal void AreSupported_SupportedBrackets_ReturnsTrue(BracketsType bracketsType)
     {
         var brackets = new Brackets(bracketsType);
 

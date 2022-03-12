@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace CCHelper.Services.ArgumentsProcessor.StringSequenceInterpreter;
+namespace CCHelper.Services.ArgumentsProcessor.StringInterpreter;
 
 internal class StringSequenceInterpreter
 {
@@ -14,7 +14,7 @@ internal class StringSequenceInterpreter
         (?<{_elementsCapturingGroup}>
             (
                 (?<digit>[-+]?\d+)
-                (?<separator>,\s*)?
+                (?<separator>\s*,\s*)?
             )*  # Wraps elemenets as an integral whole.
         )
         \s*{_brackets.ClosingBracket}",
