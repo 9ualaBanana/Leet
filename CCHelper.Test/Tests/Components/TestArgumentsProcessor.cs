@@ -1,5 +1,4 @@
-﻿using CCHelper.Services;
-using CCHelper.Test.Framework;
+﻿using CCHelper.Services.ArgumentsProcessing;
 using CCHelper.Test.Framework.Abstractions.SolutionContext;
 using CCHelper.Test.Framework.Abstractions.SolutionMethod;
 using CCHelper.Test.Framework.TestData;
@@ -17,113 +16,17 @@ public class TestArgumentsProcessor : DynamicContextFixture
         return () => new ArgumentsProcessor(_context.SolutionContainer.DefinedMethod, arguments).Process();
     }
 
-    [Theory]
-    [MemberData(nameof(TypeData.DefaultValues), MemberType = typeof(TypeData))]
-    public void WhenArgumentsOfWrongTypePassed_ShouldThrow(object argument)
-    {
-        Type parameterType = typeof(int);
-        if (argument.GetType() == parameterType) return;
 
-        SolutionMethodStub
-            .NewStub
-            .WithSolutionLabel
-            .Accepting(parameterType)
-            .Returning(TypeData.DummyType)
-            .PutInContext(_context);
-
-        Assert.Throws<ArgumentException>(SUT_ProcessArguments(argument));
-    }
-
-    [Theory]
-    [InlineData(new object[] { new Type[] { typeof(int?) } })]
-    [InlineData(new object[] { new Type[] { typeof(bool?), typeof(double?) } })]
-    public void WhenCorrespondingParametersAreNullableTypes_ShouldAcceptNullArguments(Type[] parametersTypes)
-    {
-        SolutionMethodStub
-            .NewStub
-            .WithSolutionLabel
-            .Accepting(parametersTypes)
-            .Returning(TypeData.DummyType)
-            .PutInContext(_context);
-
-        Assert.True(SUT_ProcessArguments(GetNullArguments(parametersTypes.Length)).DoesNotThrow());
-    }
-
-    [Theory]
-    [InlineData(new object[] { new Type[] { typeof(string) } })]
-    [InlineData(new object[] { new Type[] { typeof(string), typeof(object) } })]
-    public void WhenCorrespondingParametersAreReferenceTypes_ShouldAcceptNullArguments(Type[] parametersTypes)
-    {
-        SolutionMethodStub
-            .NewStub
-            .WithSolutionLabel
-            .Accepting(parametersTypes)
-            .Returning(TypeData.DummyType)
-            .PutInContext(_context);
-
-        Assert.True(SUT_ProcessArguments(GetNullArguments(parametersTypes.Length)).DoesNotThrow());
-    }
 
     [Fact]
-    public void WhenSolutionMethodHasNoParameters_ShouldAcceptEmptyArguments()
+    public void WhenEmptyArgumentsPassedToSolutionMethodWithNoParameters_ShouldNotThrow()
     {
         SolutionMethodStub
             .NewStub
-            .WithSolutionLabel
             .Returning(TypeData.DummyType)
             .PutInContext(_context);
 
-        Assert.True(SUT_ProcessArguments(EmptyArgumentsList).DoesNotThrow());
-    }
-
-    [Theory]
-    [MemberData(nameof(TypeData.DefaultValues), MemberType = typeof(TypeData))]
-    public void WhenArgumentsPassedAsSeparateElements_ShouldWrapThem(object value)
-    {
-        SolutionMethodStub
-            .NewStub
-            .WithSolutionLabel
-            .Accepting(value.GetType(), value.GetType())
-            .Returning(TypeData.DummyType)
-            .PutInContext(_context);
-
-        Assert.True(SUT_ProcessArguments(value, value).DoesNotThrow());
-    }
-
-    [Theory]
-    [InlineData(new object[] { new int[] { default } })]
-    [InlineData(new object[] { new int[] { default, default, default } })]
-    public void WhenParamsUnwrapsArrayArguments_ShouldWrapThem(object arguments)
-    {
-        SolutionMethodStub
-            .NewStub
-            .WithSolutionLabel
-            .Accepting(arguments.GetType())
-            .Returning(TypeData.DummyType)
-            .PutInContext(_context);
-
-        Assert.True(SUT_ProcessArguments(arguments).DoesNotThrow());
-    }
-
-    [Theory]
-    [InlineData(0, 1)]
-    [InlineData(1, 0)]
-    [InlineData(1, 2)]
-    [InlineData(4, 3)]
-    public void WhenWrongNumberOfArgumentsPassed_ShouldThrow(int parametersCount, int argumentsCount)
-    {
-        var dummyParameters = new Type[parametersCount];
-        Array.Fill(dummyParameters, TypeData.DummyType);
-        var dummyArguments = new object[argumentsCount];
-        Array.Fill(dummyArguments, new object());
-        SolutionMethodStub
-            .NewStub
-            .WithSolutionLabel
-            .Accepting(dummyParameters)
-            .Returning(TypeData.DummyType)
-            .PutInContext(_context);
-
-        Assert.Throws<TargetParameterCountException>(SUT_ProcessArguments(dummyArguments));
+        Assert.Null(Record.Exception(SUT_ProcessArguments(EmptyArgumentsList)));
     }
 
     [Fact]
@@ -139,21 +42,155 @@ public class TestArgumentsProcessor : DynamicContextFixture
         Assert.Throws<TargetParameterCountException>(SUT_ProcessArguments(EmptyArgumentsList));
     }
 
-    [Theory(Skip = "Obsolete. null arguments used to be not allowed.")]
-    [InlineData(new object[] { null! })]
-    [InlineData(new object[] { new object[] { null!, null! } })]
-    [InlineData(new object[] { new object[] { default(int), null! } })]
-    public void WhenNullArgumentsPassed_ShouldThrow(object[] arguments)
+    [Theory]
+    [InlineData(0, 1)]
+    [InlineData(1, 0)]
+    [InlineData(1, 2)]
+    [InlineData(4, 3)]
+    public void WhenWrongNumberOfArgumentsPassed_ShouldThrow(int parametersCount, int argumentsCount)
     {
+        var dummyParameters = new Type[parametersCount];
+        Array.Fill(dummyParameters, TypeData.DummyType);
+        var dummyArguments = new object[argumentsCount];
+        Array.Fill(dummyArguments, new object());
         SolutionMethodStub
             .NewStub
-            .WithSolutionLabel
-            .Accepting(TypeData.DummyType, TypeData.DummyType)
+            .Accepting(dummyParameters)
             .Returning(TypeData.DummyType)
             .PutInContext(_context);
 
-        Assert.Throws<ArgumentNullException>(SUT_ProcessArguments(arguments));
+        Assert.Throws<TargetParameterCountException>(SUT_ProcessArguments(dummyArguments));
     }
+
+
+
+    [Theory]
+    [MemberData(nameof(TypeData.DefaultValues), MemberType = typeof(TypeData))]
+    public void WhenArgumentsOfWrongTypePassed_ShouldThrow(object argument)
+    {
+        Type parameterType = typeof(int);
+        if (argument.GetType() == parameterType) return;
+
+        SolutionMethodStub
+            .NewStub
+            .Accepting(parameterType)
+            .Returning(TypeData.DummyType)
+            .PutInContext(_context);
+
+        Assert.Throws<ArgumentException>(SUT_ProcessArguments(argument));
+    }
+
+    [Theory]
+    [InlineData(new object[] { new Type[] { typeof(int?) } })]
+    [InlineData(new object[] { new Type[] { typeof(bool?), typeof(double?) } })]
+    public void WhenCorrespondingParametersAreNullableTypes_ShouldNotThrow(Type[] parametersTypes)
+    {
+        SolutionMethodStub
+            .NewStub
+            .Accepting(parametersTypes)
+            .Returning(TypeData.DummyType)
+            .PutInContext(_context);
+
+        Assert.Null(Record.Exception(SUT_ProcessArguments(GetNullArguments(parametersTypes.Length))));
+    }
+
+    [Theory]
+    [InlineData(new object[] { new Type[] { typeof(string) } })]
+    [InlineData(new object[] { new Type[] { typeof(string), typeof(object) } })]
+    public void WhenCorrespondingParametersAreReferenceTypes_ShouldNotThrow(Type[] parametersTypes)
+    {
+        SolutionMethodStub
+            .NewStub
+            .Accepting(parametersTypes)
+            .Returning(TypeData.DummyType)
+            .PutInContext(_context);
+
+        Assert.Null(Record.Exception(SUT_ProcessArguments(GetNullArguments(parametersTypes.Length))));
+    }
+
+
+    [Fact]
+    public void WhenParamsUnwrapsArrayArguments_ShouldNotThrow()
+    {
+        var arguments = new int[][] { new int[] { default }, new int[] { default } };
+        SolutionMethodStub
+            .NewStub
+            .Accepting(arguments.GetType())
+            .Returning(TypeData.DummyType)
+            .PutInContext(_context);
+
+        Assert.Null(Record.Exception(SUT_ProcessArguments(arguments)));
+    }
+
+    [Theory]
+    [MemberData(nameof(TypeData.DefaultValues), MemberType = typeof(TypeData))]
+    public void WhenArgumentsPassedAsSeparateElements_ShouldNotThrow(object value)
+    {
+        SolutionMethodStub
+            .NewStub
+            .Accepting(value.GetType(), value.GetType())
+            .Returning(TypeData.DummyType)
+            .PutInContext(_context);
+
+        Assert.Null(Record.Exception(SUT_ProcessArguments(value, value)));
+    }
+
+    [Theory]
+    [MemberData(nameof(TypeData.ReferenceTypes), MemberType = typeof(TypeData))]
+    [MemberData(nameof(TypeData.NullableTypes), MemberType = typeof(TypeData))]
+    public void WhenSingleNullArgumentPassed_ShouldNotThrow(Type canHoldNull)
+    {
+        SolutionMethodStub
+            .NewStub
+            .Accepting(canHoldNull)
+            .Returning(TypeData.DummyType)
+            .PutInContext(_context);
+
+        Assert.Null(Record.Exception(SUT_ProcessArguments(null)));
+    }
+
+
+
+    [Theory]
+    [MemberData(nameof(StringSequenceData.NonJagged), MemberType = typeof(StringSequenceData))]
+    public void WhenNonJaggedStringSequenceArgumentPassed_ShouldNotThrow(string stringSequence, int[] _)
+    {
+        SolutionMethodStub
+            .NewStub
+            .Accepting(typeof(int[]))
+            .Returning(TypeData.DummyType)
+            .PutInContext(_context);
+
+        Assert.Null(Record.Exception(SUT_ProcessArguments(stringSequence)));
+    }
+    
+    [Theory]
+    [MemberData(nameof(StringSequenceData.Jagged), MemberType = typeof(StringSequenceData))]
+    public void WhenJaggedStringSequenceArgumentPassed_ShouldNotThrow(string stringSequence, int[][] _)
+    {
+        SolutionMethodStub
+            .NewStub
+            .Accepting(typeof(int[][]))
+            .Returning(TypeData.DummyType)
+            .PutInContext(_context);
+
+        Assert.Null(Record.Exception(SUT_ProcessArguments(stringSequence)));
+    }
+
+    [Theory]
+    [MemberData(nameof(StringSequenceData.Erroneous), MemberType = typeof(StringSequenceData))]
+    public void WhenUnsupportedStringArgumentPassed_ShouldThrow(string unsupportedString)
+    {
+        SolutionMethodStub
+            .NewStub
+            .Accepting(TypeData.DummyType)
+            .Returning(TypeData.DummyType)
+            .PutInContext(_context);
+
+        Assert.NotNull(Record.Exception(SUT_ProcessArguments(unsupportedString)));
+    }
+
+
 
     /// <summary>
     /// Imitates passing no arguments to the public interface that takes arguments in form of `params object[]`

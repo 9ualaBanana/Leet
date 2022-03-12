@@ -13,8 +13,10 @@ public class TestSolutionMethodValidator : DynamicContextFixture
     MethodInfo DefinedSolutionMethod => _context.SolutionContainer.DefinedMethod;
     void SUT_IsValidSolutionMethod() => SolutionMethodValidator.IsValidSolutionMethod(DefinedSolutionMethod);
 
+
+
     [Fact]
-    public void WhenSolutionMethodHasMultipleDifferentLabels_ShouldThrow()
+    public void SUT_SolutionMethodHasMultipleDifferentLabels_Throws()
     {
         SolutionMethodStub
             .NewStub
@@ -28,19 +30,7 @@ public class TestSolutionMethodValidator : DynamicContextFixture
     }
 
     [Fact]
-    public void WhenOutputSolutionReturnTypeIsVoid_ShouldThrow()
-    {
-        SolutionMethodStub
-            .NewStub
-            .WithSolutionLabel
-            .Returning(typeof(void))
-            .PutInContext(_context);
-
-        Assert.Throws<FormatException>(SUT_IsValidSolutionMethod);
-    }
-
-    [Fact]
-    public void WhenInputSolutionHasMultipleResultLabels_ShouldThrow()
+    public void SUT_SolutionMethodHasMultipleResultLabels_Throws()
     {
         SolutionMethodStub
             .NewStub
@@ -52,22 +42,34 @@ public class TestSolutionMethodValidator : DynamicContextFixture
         Assert.Throws<AmbiguousMatchException>(SUT_IsValidSolutionMethod);
     }
 
-    [Theory]
-    [MemberData(nameof(TypeData.Types), MemberType = typeof(TypeData))]
-    public void WhenInputSolutionReturnTypeIsNotVoid_ShouldThrow(Type returnType)
+
+
+    [Fact]
+    public void HasSolutionLabel_SolutionLabelApplied_ReturnsTrue()
     {
         SolutionMethodStub
             .NewStub
-            .Accepting(TypeData.DummyType)
-            .WithResultLabelAppliedToParameter(1)
-            .Returning(returnType)
+            .WithSolutionLabel
+            .Returning(TypeData.DummyType)
             .PutInContext(_context);
 
-        Assert.Throws<FormatException>(SUT_IsValidSolutionMethod);
+        Assert.True(SolutionMethodValidator.HasSolutionLabel(DefinedSolutionMethod));
     }
 
     [Fact]
-    public void WhenResultLabelApplied_ShouldHaveResultLabel()
+    public void HasSolutionLabel_SolutionLableNotApplied_ReturnsFalse()
+    {
+        SolutionMethodStub
+            .NewStub
+            .Returning(TypeData.DummyType)
+            .PutInContext(_context);
+
+        Assert.False(SolutionMethodValidator.HasResultLabel(DefinedSolutionMethod));
+    }
+
+
+    [Fact]
+    public void HasResultLabel_ResultLabelApplied_ReturnsTrue()
     {
         SolutionMethodStub
             .NewStub
@@ -80,7 +82,7 @@ public class TestSolutionMethodValidator : DynamicContextFixture
     }
 
     [Fact]
-    public void WhenResultLabelIsNotApplied_ShouldNotHaveResultLabel()
+    public void HasResultLabel_ResultLabelNotApplied_ReturnsFalse()
     {
         SolutionMethodStub
             .NewStub
@@ -90,26 +92,33 @@ public class TestSolutionMethodValidator : DynamicContextFixture
         Assert.False(SolutionMethodValidator.HasResultLabel(DefinedSolutionMethod));
     }
 
+
+
     [Fact]
-    public void WhenSolutionLabelApplied_ShouldHaveSolutionLabel()
+    public void SUT_OutputSolutionReturnTypeIsVoid_Throws()
     {
         SolutionMethodStub
             .NewStub
             .WithSolutionLabel
-            .Returning(TypeData.DummyType)
+            .Returning(typeof(void))
             .PutInContext(_context);
 
-        Assert.True(SolutionMethodValidator.HasSolutionLabel(DefinedSolutionMethod));
+        Assert.Throws<FormatException>(SUT_IsValidSolutionMethod);
     }
 
-    [Fact]
-    public void WhenSolutionLabelIsNotApplied_ShouldNotHaveSolutionLabel()
+    [Theory]
+    [MemberData(nameof(TypeData.ValueTypes), MemberType = typeof(TypeData))]
+    [MemberData(nameof(TypeData.NullableTypes), MemberType = typeof(TypeData))]
+    [MemberData(nameof(TypeData.ReferenceTypes), MemberType = typeof(TypeData))]
+    public void SUT_InputSolutionReturnTypeIsNotVoid_Throws(Type returnType)
     {
         SolutionMethodStub
             .NewStub
-            .Returning(TypeData.DummyType)
+            .Accepting(TypeData.DummyType)
+            .WithResultLabelAppliedToParameter(1)
+            .Returning(returnType)
             .PutInContext(_context);
 
-        Assert.False(SolutionMethodValidator.HasResultLabel(DefinedSolutionMethod));
+        Assert.Throws<FormatException>(SUT_IsValidSolutionMethod);
     }
 }

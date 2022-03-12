@@ -8,7 +8,7 @@ public static class TypeData
     internal static Type DummyType = typeof(int);
     internal static int DummyValue = default;
 
-    public static IEnumerable<object[]> Types
+    public static IEnumerable<object[]> ValueTypes
     {
         get
         {
@@ -19,9 +19,8 @@ public static class TypeData
             yield return new object[] { typeof(double) };
             yield return new object[] { typeof(decimal) };
             yield return new object[] { typeof(char) };
-            yield return new object[] { typeof(string) };
             yield return new object[] { typeof(bool) };
-            yield return new object[] { typeof(object) };
+
         }
     }
     public static IEnumerable<object[]> NullableTypes
@@ -38,6 +37,14 @@ public static class TypeData
             yield return new object[] { typeof(bool?) };
         }
     }
+    public static IEnumerable<object[]> ReferenceTypes
+    {
+        get
+        {
+            yield return new object[] { typeof(object) };
+            yield return new object[] { typeof(string) };
+        }
+    }
 
     public static IEnumerable<object[]> DefaultValues
     {
@@ -51,7 +58,6 @@ public static class TypeData
             yield return new object[] { default(double) };
             yield return new object[] { default(float) };
             yield return new object[] { default(decimal) };
-            yield return new object[] { string.Empty };
         }
     }
 }
