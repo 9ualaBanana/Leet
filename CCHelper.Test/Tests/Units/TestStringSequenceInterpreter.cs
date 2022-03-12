@@ -13,39 +13,95 @@ public class TestStringSequenceInterpreter
 
 
     [Theory]
-    [MemberData(nameof(InconsistentBrackets))]
+    [MemberData(nameof(StringSequenceData.Erroneous), MemberType = typeof(StringSequenceData))]
     public void ToEnumerable_StringWithInconsistentBrackets_Throws(string stringWithBrackets)
     {
         Assert.Throws<ArgumentException>(() => SUT_StringSequenceInterpreter(stringWithBrackets).ToEnumerable());
     }
 
     [Theory]
-    [MemberData(nameof(InconsistentBrackets))]
+    [MemberData(nameof(StringSequenceData.Erroneous), MemberType = typeof(StringSequenceData))]
     public void ToArray_StringWithInconsistentBrackets_Throws(string stringWithBrackets)
     {
         Assert.Throws<ArgumentException>(() => SUT_StringSequenceInterpreter(stringWithBrackets).ToArray());
     }
 
     [Theory]
-    [MemberData(nameof(InconsistentBrackets))]
+    [MemberData(nameof(StringSequenceData.Erroneous), MemberType = typeof(StringSequenceData))]
     public void ToJaggedArray_StringWithInconsistentBrackets_Throws(string stringWithBrackets)
     {
         Assert.Throws<ArgumentException>(() => SUT_StringSequenceInterpreter(stringWithBrackets).ToJaggedArray());
     }
 
-    public static IEnumerable<object[]> InconsistentBrackets
+
+
+    [Theory]
+    [MemberData(nameof(StringSequenceData.Erroneous), MemberType = typeof(StringSequenceData))]
+    public void ToEnumerable_UnsupportedString_Throws(string stringWithBrackets)
     {
-        get
-        {
-            yield return new object[] { "(>" };
-            yield return new object[] { "{]" };
-            yield return new object[] { "[)" };
-            yield return new object[] { "<}" };
-        }
+        Assert.Throws<ArgumentException>(() => SUT_StringSequenceInterpreter(stringWithBrackets).ToEnumerable());
     }
 
-    public static IEnumerable<object[]> StringSequencesAndTheirInterpretation
+    [Theory]
+    [MemberData(nameof(StringSequenceData.Erroneous), MemberType = typeof(StringSequenceData))]
+    public void ToArray_UnsupportedString_Throws(string stringWithBrackets)
     {
+        Assert.Throws<ArgumentException>(() => SUT_StringSequenceInterpreter(stringWithBrackets).ToArray());
+    }
+
+    [Theory]
+    [MemberData(nameof(StringSequenceData.Erroneous), MemberType = typeof(StringSequenceData))]
+    public void ToJaggedArray_UnsupportedString_Throws(string stringWithBrackets)
+    {
+        Assert.Throws<ArgumentException>(() => SUT_StringSequenceInterpreter(stringWithBrackets).ToJaggedArray());
+    }
+
+
+
+    [Theory]
+    [MemberData(nameof(StringSequenceData.Empty), MemberType = typeof(StringSequenceData))]
+    public void ToEnumerable_EmptyString_Throws(string stringWithBrackets)
+    {
+        Assert.Throws<InvalidOperationException>(() => SUT_StringSequenceInterpreter(stringWithBrackets).ToEnumerable());
+    }
+
+    [Theory]
+    [MemberData(nameof(StringSequenceData.Empty), MemberType = typeof(StringSequenceData))]
+    public void ToArray_EmptyString_Throws(string stringWithBrackets)
+    {
+        Assert.Throws<InvalidOperationException>(() => SUT_StringSequenceInterpreter(stringWithBrackets).ToArray());
+    }
+
+    [Theory]
+    [MemberData(nameof(StringSequenceData.Empty), MemberType = typeof(StringSequenceData))]
+    public void ToJaggedArray_EmptyString_Throws(string stringWithBrackets)
+    {
+        Assert.Throws<InvalidOperationException>(() => SUT_StringSequenceInterpreter(stringWithBrackets).ToJaggedArray());
+    }
+
+
+
+    [Theory]
+    [MemberData(nameof(StringSequenceData.NonJagged), MemberType = typeof(StringSequenceData))]
+    public void AppropriateInterpreter_StringSequence_ReturnsToArray(string stringSequence, int[] _)
+    {
+        var sut = SUT_StringSequenceInterpreter(stringSequence);
+        var appropriateInterpreter = sut.AppropriateInterpreter;
+
+        Assert.Equal(sut.ToArray, appropriateInterpreter);
+    }
+
+    [Theory]
+    [MemberData(nameof(StringSequenceData.Jagged), MemberType = typeof(StringSequenceData))]
+    public void AppropriateInterpreter_JaggedStringSequence_ReturnsToJaggedArray(string stringSequence, int[][] _)
+    {
+        var sut = SUT_StringSequenceInterpreter(stringSequence);
+        var appropriateInterpreter = sut.AppropriateInterpreter;
+
+        Assert.Equal(sut.ToJaggedArray, appropriateInterpreter);
+    }
+
+
 
     [Theory]
     [MemberData(nameof(StringSequenceData.NonJagged), MemberType = typeof(StringSequenceData))]

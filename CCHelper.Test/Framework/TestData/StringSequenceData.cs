@@ -114,4 +114,34 @@ internal static class StringSequenceData
             };
         }
     }
+
+    public static IEnumerable<object[]> Erroneous
+    {
+        get
+        {
+            yield return new object[] { "]" };
+            yield return new object[] { "[" };
+            yield return new object[] { "[]" };
+            yield return new object[] { "[ ]" };
+            yield return new object[] { "[[[[" };
+            yield return new object[] { "]]]]" };
+            yield return new object[] { "unsupported" };
+            yield return new object[] { "[unsupported]" };
+            yield return new object[] { "(>" };
+            yield return new object[] { "{]" };
+            yield return new object[] { "[)" };
+            yield return new object[] { "<}" };
+        }
+    }
+
+    public static IEnumerable<object[]> Empty
+    {
+        get
+        {
+            yield return new object[] { string.Empty };
+            yield return new object[] { "" };
+            yield return new object[] { " " };
+            yield return new object[] { "         " };
+        }
+    }
 }

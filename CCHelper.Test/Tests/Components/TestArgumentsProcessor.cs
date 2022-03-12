@@ -19,11 +19,10 @@ public class TestArgumentsProcessor : DynamicContextFixture
 
 
     [Fact]
-    public void WhenSolutionMethodHasNoParameters_ShouldAcceptEmptyArguments()
+    public void WhenEmptyArgumentsPassedToSolutionMethodWithNoParameters_ShouldNotThrow()
     {
         SolutionMethodStub
             .NewStub
-            .WithSolutionLabel
             .Returning(TypeData.DummyType)
             .PutInContext(_context);
 
@@ -56,7 +55,6 @@ public class TestArgumentsProcessor : DynamicContextFixture
         Array.Fill(dummyArguments, new object());
         SolutionMethodStub
             .NewStub
-            .WithSolutionLabel
             .Accepting(dummyParameters)
             .Returning(TypeData.DummyType)
             .PutInContext(_context);
@@ -75,7 +73,6 @@ public class TestArgumentsProcessor : DynamicContextFixture
 
         SolutionMethodStub
             .NewStub
-            .WithSolutionLabel
             .Accepting(parameterType)
             .Returning(TypeData.DummyType)
             .PutInContext(_context);
@@ -86,11 +83,10 @@ public class TestArgumentsProcessor : DynamicContextFixture
     [Theory]
     [InlineData(new object[] { new Type[] { typeof(int?) } })]
     [InlineData(new object[] { new Type[] { typeof(bool?), typeof(double?) } })]
-    public void WhenCorrespondingParametersAreNullableTypes_ShouldAcceptNullArguments(Type[] parametersTypes)
+    public void WhenCorrespondingParametersAreNullableTypes_ShouldNotThrow(Type[] parametersTypes)
     {
         SolutionMethodStub
             .NewStub
-            .WithSolutionLabel
             .Accepting(parametersTypes)
             .Returning(TypeData.DummyType)
             .PutInContext(_context);
@@ -101,11 +97,10 @@ public class TestArgumentsProcessor : DynamicContextFixture
     [Theory]
     [InlineData(new object[] { new Type[] { typeof(string) } })]
     [InlineData(new object[] { new Type[] { typeof(string), typeof(object) } })]
-    public void WhenCorrespondingParametersAreReferenceTypes_ShouldAcceptNullArguments(Type[] parametersTypes)
+    public void WhenCorrespondingParametersAreReferenceTypes_ShouldNotThrow(Type[] parametersTypes)
     {
         SolutionMethodStub
             .NewStub
-            .WithSolutionLabel
             .Accepting(parametersTypes)
             .Returning(TypeData.DummyType)
             .PutInContext(_context);
@@ -118,11 +113,10 @@ public class TestArgumentsProcessor : DynamicContextFixture
     [Theory]
     [InlineData(new object[] { new int[] { default } })]
     [InlineData(new object[] { new int[] { default, default, default } })]
-    public void WhenParamsUnwrapsArrayArguments_ShouldWrapThem(object arguments)
+    public void WhenParamsUnwrapsArrayArguments_ShouldNotThrow(object arguments)
     {
         SolutionMethodStub
             .NewStub
-            .WithSolutionLabel
             .Accepting(arguments.GetType())
             .Returning(TypeData.DummyType)
             .PutInContext(_context);
@@ -132,11 +126,10 @@ public class TestArgumentsProcessor : DynamicContextFixture
 
     [Theory]
     [MemberData(nameof(TypeData.DefaultValues), MemberType = typeof(TypeData))]
-    public void WhenArgumentsPassedAsSeparateElements_ShouldWrapThem(object value)
+    public void WhenArgumentsPassedAsSeparateElements_ShouldNotThrow(object value)
     {
         SolutionMethodStub
             .NewStub
-            .WithSolutionLabel
             .Accepting(value.GetType(), value.GetType())
             .Returning(TypeData.DummyType)
             .PutInContext(_context);
@@ -144,26 +137,28 @@ public class TestArgumentsProcessor : DynamicContextFixture
         Assert.Null(Record.Exception(SUT_ProcessArguments(value, value)));
     }
 
-    [Fact]
-    public void WhenSingleNullArgumentPassed_ShouldWrapIt()
+    [Theory]
+    [MemberData(nameof(TypeData.ReferenceTypes), MemberType = typeof(TypeData))]
+    [MemberData(nameof(TypeData.NullableTypes), MemberType = typeof(TypeData))]
+    public void WhenSingleNullArgumentPassed_ShouldNotThrow(Type canHoldNull)
     {
         SolutionMethodStub
             .NewStub
-            .WithSolutionLabel
-            .Accepting(typeof(object))
+            .Accepting(canHoldNull)
             .Returning(TypeData.DummyType)
             .PutInContext(_context);
 
         Assert.Null(Record.Exception(SUT_ProcessArguments(null)));
     }
 
+
+
     [Theory]
     [MemberData(nameof(StringSequenceData.NonJagged), MemberType = typeof(StringSequenceData))]
-    public void WhenNonJaggedStringSequenceArgumentPassed_ShouldInterpretIt(string stringSequence, int[] _)
+    public void WhenNonJaggedStringSequenceArgumentPassed_ShouldNotThrow(string stringSequence, int[] _)
     {
         SolutionMethodStub
             .NewStub
-            .WithSolutionLabel
             .Accepting(typeof(int[]))
             .Returning(TypeData.DummyType)
             .PutInContext(_context);
@@ -173,16 +168,28 @@ public class TestArgumentsProcessor : DynamicContextFixture
     
     [Theory]
     [MemberData(nameof(StringSequenceData.Jagged), MemberType = typeof(StringSequenceData))]
-    public void WhenJaggedStringSequenceArgumentPassed_ShouldInterpretIt(string stringSequence, int[][] _)
+    public void WhenJaggedStringSequenceArgumentPassed_ShouldNotThrow(string stringSequence, int[][] _)
     {
         SolutionMethodStub
             .NewStub
-            .WithSolutionLabel
             .Accepting(typeof(int[][]))
             .Returning(TypeData.DummyType)
             .PutInContext(_context);
 
         Assert.Null(Record.Exception(SUT_ProcessArguments(stringSequence)));
+    }
+
+    [Theory]
+    [MemberData(nameof(StringSequenceData.Erroneous), MemberType = typeof(StringSequenceData))]
+    public void WhenUnsupportedStringArgumentPassed_ShouldThrow(string unsupportedString)
+    {
+        SolutionMethodStub
+            .NewStub
+            .Accepting(TypeData.DummyType)
+            .Returning(TypeData.DummyType)
+            .PutInContext(_context);
+
+        Assert.NotNull(Record.Exception(SUT_ProcessArguments(unsupportedString)));
     }
 
 

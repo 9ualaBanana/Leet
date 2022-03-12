@@ -15,7 +15,7 @@ internal class StringSequenceInterpreter
             (
                 (?<digit>[-+]?\d+)
                 (?<separator>\s*,\s*)?
-            )*  # Wraps elemenets as an integral whole.
+            )+  # Wraps elemenets as an integral whole.
         )
         \s*{_brackets.ClosingBracket}",
         RegexOptions.IgnorePatternWhitespace | RegexOptions.ExplicitCapture
@@ -43,6 +43,30 @@ internal class StringSequenceInterpreter
         if (brackets.AreSupported) return brackets;
 
         throw new ArgumentException("Exception occured when trying to retrieve brackets.", nameof(_stringSequence));
+    }
+
+    internal Func<object> AppropriateInterpreter => Dimensions > 1 ? ToJaggedArray : ToArray;
+
+    int _dimensions;
+    int Dimensions
+    {
+        get
+        {
+            if (_dimensions != 0) return _dimensions;
+
+            foreach (var symbol in _stringSequence)
+            {
+                if (symbol == _brackets.OpeningBracket || symbol == ' ')
+                {
+                    if (symbol == _brackets.OpeningBracket) _dimensions++;
+                    continue;
+                }
+                break;
+            }
+            return _dimensions != 0 ?
+                _dimensions :
+                throw new ArgumentException("Exception occured when trying to count dimensions.", nameof(_stringSequence));
+        }
     }
 
     internal int[] ToArray()
