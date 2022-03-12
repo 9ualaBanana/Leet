@@ -1,4 +1,4 @@
-﻿using CCHelper.Services.ArgumentsProcessor;
+﻿using CCHelper.Services.ArgumentsProcessing;
 using CCHelper.Test.Framework.Abstractions.SolutionContext;
 using CCHelper.Test.Framework.Abstractions.SolutionMethod;
 using CCHelper.Test.Framework.TestData;
@@ -109,12 +109,10 @@ public class TestArgumentsProcessor : DynamicContextFixture
     }
 
 
-
-    [Theory]
-    [InlineData(new object[] { new int[] { default } })]
-    [InlineData(new object[] { new int[] { default, default, default } })]
-    public void WhenParamsUnwrapsArrayArguments_ShouldNotThrow(object arguments)
+    [Fact]
+    public void WhenParamsUnwrapsArrayArguments_ShouldNotThrow()
     {
+        var arguments = new int[][] { new int[] { default }, new int[] { default } };
         SolutionMethodStub
             .NewStub
             .Accepting(arguments.GetType())

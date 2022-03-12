@@ -1,4 +1,4 @@
-﻿using CCHelper.Services.ArgumentsProcessor.StringInterpreter;
+﻿using CCHelper.Services.ArgumentsProcessing.StringInterpreter;
 using CCHelper.Test.Framework.TestData;
 using System;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ namespace CCHelper.Test.Tests.Units;
 
 public class TestStringSequenceInterpreter
 {
-    static StringSequenceInterpreter SUT_StringSequenceInterpreter(string stringSequence) => new(stringSequence);
+    StringSequenceInterpreter SUT_StringSequenceInterpreter(string stringSequence) => new(stringSequence);
 
 
 

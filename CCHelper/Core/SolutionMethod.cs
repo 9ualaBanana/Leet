@@ -1,5 +1,5 @@
 ﻿using CCHelper.Services;
-using CCHelper.Services.ArgumentsProcessor;
+using CCHelper.Services.ArgumentsProcessing;
 using System.Reflection;
 
 namespace CCHelper.Core;

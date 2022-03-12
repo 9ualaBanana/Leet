@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace CCHelper.Services.ArgumentsProcessor.StringInterpreter;
+namespace CCHelper.Services.ArgumentsProcessing.StringInterpreter;
 
 internal class StringSequenceInterpreter
 {

@@ -1,4 +1,4 @@
-﻿namespace CCHelper.Services.ArgumentsProcessor.StringInterpreter;
+﻿namespace CCHelper.Services.ArgumentsProcessing.StringInterpreter;
 
 internal record Brackets
 {

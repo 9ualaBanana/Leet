@@ -1,13 +1,15 @@
 ﻿using System.Reflection;
+using CCHelper.Services.ArgumentsProcessing.ArgumentsFormats;
 
-namespace CCHelper.Services.ArgumentsProcessor;
+namespace CCHelper.Services.ArgumentsProcessing;
 
 internal class ArgumentsProcessor
 {
     const object[]? EMPTY_ARGUMENTS = null;
-    readonly static IArgumentsFormat[] _supportedFormats =
+    readonly static ArgumentsFormat[] _supportedFormats =
     {
-        new UnwrappedArguments()
+        new UnwrappedArgumentsFormat(),
+        new StringSequenceArgumentsFormat()
     };
 
     readonly MethodInfo _method;
