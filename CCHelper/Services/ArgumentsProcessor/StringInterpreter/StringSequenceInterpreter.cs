@@ -115,6 +115,14 @@ public class StringSequenceInterpreter<TInterpreted>
 
     IEnumerable<TInterpreted> CastStringElements(string[] stringElements)
     {
-        return stringElements.Select(stringElement => _interpreter(stringElement));
+        try
+        {
+            return stringElements.Select(stringElement => _interpreter(stringElement));
+        }
+        catch (FormatException castException)
+        {
+            throw new InvalidCastException("The exception occurred trying to cast elements of the string sequence " +
+                "using the provided interpreter.", castException);
+        }
     }
 }

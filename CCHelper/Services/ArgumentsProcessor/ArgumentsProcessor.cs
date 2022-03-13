@@ -1,37 +1,41 @@
 ﻿using System.Reflection;
-using CCHelper.Services.ArgumentsProcessing.ArgumentsFormats;
+using CCHelper.Services.ArgumentsProcessing.StringInterpreter;
 
 namespace CCHelper.Services.ArgumentsProcessing;
 
-internal class ArgumentsProcessor
+internal class ArgumentsProcessor<TInterpreted>
 {
     const object[]? EMPTY_ARGUMENTS = null;
-    readonly static ArgumentsFormat[] _supportedFormats =
-    {
-        new UnwrappedArgumentsFormat(),
-        new StringSequenceArgumentsFormat()
-    };
 
     readonly MethodInfo _method;
     readonly object?[] _arguments;
+    readonly Func<string, TInterpreted> _interpreter;
 
-    internal ArgumentsProcessor(MethodInfo method, object?[]? arguments)
+    internal ArgumentsProcessor(MethodInfo method, object?[]? arguments, Func<string, TInterpreted> interpreter)
     {
-        _arguments = NormalizedArguments(arguments);
+        _arguments = Preprocess(arguments);
         _method = method;
+        _interpreter = interpreter;
     }
-    static object?[] NormalizedArguments(object?[]? arguments)
+    static object?[] Preprocess(object?[]? arguments)
     {
-        foreach (var argumentsFormat in _supportedFormats)
-        {
-            if (argumentsFormat.Match(arguments))
-            {
-                argumentsFormat.Normalize(ref arguments);
-                break;
-            }
-        }
+        if (ArgumentsUnwrapped(arguments)) WrapArguments(ref arguments);
+
         return arguments!;
     }
+
+    /// <summary>
+    /// The single <c>null</c> argument or a jagged array argument got unwrapped by <c>params object[]</c>.
+    /// </summary>
+    static bool ArgumentsUnwrapped(object?[]? arguments)
+    {
+        return arguments is null || arguments.GetType() != typeof(object[]);
+    }
+
+    /// <summary>
+    /// Restores the actual number of passed arguments.
+    /// </summary>
+    static void WrapArguments(ref object?[]? arguments) => arguments = new object?[] { arguments };
 
     internal object?[]? Process()
     {
@@ -57,13 +61,30 @@ internal class ArgumentsProcessor
     {
         foreach (var parameter in _method.GetParameters())
         {
-            var correspondingArgument = _arguments[parameter.Position];
-            if (!TypeBinder.ArgumentCanBindToParameter(correspondingArgument, parameter))
-            {
-                var argumentInfo = correspondingArgument is null ? "null" : $"<{correspondingArgument.GetType()}>";
-                var parameterInfo = $"{parameter.Name} <{parameter.ParameterType}>";
-                throw new ArgumentException($"The argument [{argumentInfo}] can't bind to the parameter [{parameterInfo}]");
-            }
+            ref var correspondingArgument = ref _arguments[parameter.Position];
+            if (TypeBinder.ArgumentCanBindToParameter(correspondingArgument, parameter)) continue;
+
+            TryInterpretPotentialStringSequenceArgument(ref correspondingArgument);
+
+            if (TypeBinder.ArgumentCanBindToParameter(correspondingArgument, parameter)) continue;
+
+            var argumentInfo = correspondingArgument is null ? "null" : $"<{correspondingArgument.GetType()}>";
+            var parameterInfo = $"{parameter.Name} <{parameter.ParameterType}>";
+            throw new ArgumentException($"The argument [{argumentInfo}] can't bind to the parameter [{parameterInfo}]");
         }
+    }
+
+    /// <summary>
+    /// Converts the sequence represented by the string to a valid C# collection.
+    /// </summary>
+    void TryInterpretPotentialStringSequenceArgument(ref object? argument)
+    {
+        if (argument?.GetType() != typeof(string)) return;
+
+        try
+        {
+            argument = new StringSequenceInterpreter<TInterpreted>(argument.ToString()!, _interpreter).AppropriateInterpreter();
+        }
+        catch (Exception) { }
     }
 }

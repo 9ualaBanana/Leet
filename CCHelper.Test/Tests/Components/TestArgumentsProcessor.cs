@@ -11,15 +11,21 @@ namespace CCHelper.Test.Tests.Components;
 
 public class TestArgumentsProcessor : DynamicContextFixture
 {
-    Action SUT_ProcessArguments(params object?[]? arguments)
+    Func<object?[]?> SUT_ProcessArguments(params object?[]? arguments)
     {
-        return () => new ArgumentsProcessor(_context.SolutionContainer.DefinedMethod, arguments).Process();
+
+        return () => new ArgumentsProcessor<int>(_context.SolutionContainer.DefinedMethod, arguments, int.Parse).Process();
+    }
+
+    Func<object?[]?> SUT_ProcessArguments<TInterpreted>(Func<string, TInterpreted> interpreter, params object?[]? arguments)
+    {
+        return () => new ArgumentsProcessor<TInterpreted>(_context.SolutionContainer.DefinedMethod, arguments, interpreter).Process();
     }
 
 
 
     [Fact]
-    public void WhenEmptyArgumentsPassedToSolutionMethodWithNoParameters_ShouldNotThrow()
+    public void SolutionMethodWithNoParameter_EmptyArguments_DoesNotThrow()
     {
         SolutionMethodStub
             .NewStub
@@ -30,7 +36,7 @@ public class TestArgumentsProcessor : DynamicContextFixture
     }
 
     [Fact]
-    public void WhenNoArgumentsPassedToInputSolution_ShouldThrow()
+    public void InputSolution_EmptyArguments_Throws()
     {
         SolutionMethodStub
             .NewStub
@@ -47,7 +53,7 @@ public class TestArgumentsProcessor : DynamicContextFixture
     [InlineData(1, 0)]
     [InlineData(1, 2)]
     [InlineData(4, 3)]
-    public void WhenWrongNumberOfArgumentsPassed_ShouldThrow(int parametersCount, int argumentsCount)
+    public void SolutionMethod_WrongNumberOfArguments_Throws(int parametersCount, int argumentsCount)
     {
         var dummyParameters = new Type[parametersCount];
         Array.Fill(dummyParameters, TypeData.DummyType);
@@ -66,7 +72,7 @@ public class TestArgumentsProcessor : DynamicContextFixture
 
     [Theory]
     [MemberData(nameof(TypeData.DefaultValues), MemberType = typeof(TypeData))]
-    public void WhenArgumentsOfWrongTypePassed_ShouldThrow(object argument)
+    public void SolutionMethod_WrongTypeArguments_Throws(object argument)
     {
         Type parameterType = typeof(int);
         if (argument.GetType() == parameterType) return;
@@ -83,7 +89,7 @@ public class TestArgumentsProcessor : DynamicContextFixture
     [Theory]
     [InlineData(new object[] { new Type[] { typeof(int?) } })]
     [InlineData(new object[] { new Type[] { typeof(bool?), typeof(double?) } })]
-    public void WhenCorrespondingParametersAreNullableTypes_ShouldNotThrow(Type[] parametersTypes)
+    public void SolutionMethodWithNullableParameters_NullArguments_DoesNotThrow(Type[] parametersTypes)
     {
         SolutionMethodStub
             .NewStub
@@ -97,7 +103,7 @@ public class TestArgumentsProcessor : DynamicContextFixture
     [Theory]
     [InlineData(new object[] { new Type[] { typeof(string) } })]
     [InlineData(new object[] { new Type[] { typeof(string), typeof(object) } })]
-    public void WhenCorrespondingParametersAreReferenceTypes_ShouldNotThrow(Type[] parametersTypes)
+    public void SolutionMethodWithReferenceParameters_NullArguments_DoesNotThrow(Type[] parametersTypes)
     {
         SolutionMethodStub
             .NewStub
@@ -110,7 +116,7 @@ public class TestArgumentsProcessor : DynamicContextFixture
 
 
     [Fact]
-    public void WhenParamsUnwrapsArrayArguments_ShouldNotThrow()
+    public void WhenParamsUnwrapsArrayArguments_DoesNotThrow()
     {
         var arguments = new int[][] { new int[] { default }, new int[] { default } };
         SolutionMethodStub
@@ -124,7 +130,7 @@ public class TestArgumentsProcessor : DynamicContextFixture
 
     [Theory]
     [MemberData(nameof(TypeData.DefaultValues), MemberType = typeof(TypeData))]
-    public void WhenArgumentsPassedAsSeparateElements_ShouldNotThrow(object value)
+    public void SolutionMethod_SeparatelyPassedArguments_DoesNotThrow(object value)
     {
         SolutionMethodStub
             .NewStub
@@ -138,7 +144,7 @@ public class TestArgumentsProcessor : DynamicContextFixture
     [Theory]
     [MemberData(nameof(TypeData.ReferenceTypes), MemberType = typeof(TypeData))]
     [MemberData(nameof(TypeData.NullableTypes), MemberType = typeof(TypeData))]
-    public void WhenSingleNullArgumentPassed_ShouldNotThrow(Type canHoldNull)
+    public void SolutionMethod_SingleNull_DoesNotThrow(Type canHoldNull)
     {
         SolutionMethodStub
             .NewStub
@@ -153,7 +159,7 @@ public class TestArgumentsProcessor : DynamicContextFixture
 
     [Theory]
     [MemberData(nameof(StringSequenceData.NonJagged), MemberType = typeof(StringSequenceData))]
-    public void WhenNonJaggedStringSequenceArgumentPassed_ShouldNotThrow(string stringSequence, int[] _)
+    public void SolutionMethod_NonJaggedStringSequence_DoesNotThrow(string stringSequence, int[] _)
     {
         SolutionMethodStub
             .NewStub
@@ -166,7 +172,7 @@ public class TestArgumentsProcessor : DynamicContextFixture
     
     [Theory]
     [MemberData(nameof(StringSequenceData.Jagged), MemberType = typeof(StringSequenceData))]
-    public void WhenJaggedStringSequenceArgumentPassed_ShouldNotThrow(string stringSequence, int[][] _)
+    public void SolutionMethod_JaggedStringSequence_DoesNotThrow(string stringSequence, int[][] _)
     {
         SolutionMethodStub
             .NewStub
@@ -179,7 +185,7 @@ public class TestArgumentsProcessor : DynamicContextFixture
 
     [Theory]
     [MemberData(nameof(StringSequenceData.Erroneous), MemberType = typeof(StringSequenceData))]
-    public void WhenUnsupportedStringArgumentPassed_ShouldThrow(string unsupportedString)
+    public void SolutionMethodWithArrayParameter_NonSequenceString_Throws(string unsupportedString)
     {
         SolutionMethodStub
             .NewStub
@@ -188,6 +194,97 @@ public class TestArgumentsProcessor : DynamicContextFixture
             .PutInContext(_context);
 
         Assert.NotNull(Record.Exception(SUT_ProcessArguments(unsupportedString)));
+    }
+
+
+
+    [Theory]
+    [MemberData(nameof(StringSequenceData.NonJagged), MemberType = typeof(StringSequenceData))]
+    public void SolutionMethod_StringSequenceWithOtherArguments_CorrectlyProcesses(
+        string stringSequence, int[] interpretedSequence
+        )
+    {
+        object?[]? arguments = new object[] { stringSequence, TypeData.DummyValue };
+        object?[]? expectedProcessedArguments = new object[] { interpretedSequence, TypeData.DummyValue };
+        SolutionMethodStub
+            .NewStub
+            .Accepting(typeof(int[]), TypeData.DummyType)
+            .Returning(TypeData.DummyType)
+            .PutInContext(_context);
+
+        var actualProcessedArguments = SUT_ProcessArguments(arguments).Invoke();
+
+        Assert.Equal(expectedProcessedArguments, actualProcessedArguments);
+    }
+
+    [Theory]
+    [MemberData(nameof(StringSequenceData.Jagged), MemberType = typeof(StringSequenceData))]
+    [MemberData(nameof(StringSequenceData.NonJagged), MemberType = typeof(StringSequenceData))]
+    public void SolutionMethodWithStringParameter_StringSequence_DoesNotInterpret(string stringSequence, object _)
+    {
+        object?[]? arguments = new object[] { stringSequence };
+        object?[]? expectedProcessedArguments = new object[] { stringSequence };
+        SolutionMethodStub
+            .NewStub
+            .Accepting(typeof(string))
+            .Returning(TypeData.DummyType)
+            .PutInContext(_context);
+
+        var actualProcessedArguments = SUT_ProcessArguments(arguments).Invoke();
+
+        Assert.Equal(expectedProcessedArguments, actualProcessedArguments);
+    }
+
+    [Fact]
+    public void SolutionMethodWithArrayParameters_MultipleStringSequences_CorrectlyInterprets()
+    {
+        object?[]? arguments = new object[] { "[1, 2, 3]", "{ .3, 1.5, -69 }" };
+        object?[]? expectedProcessedArguments = new object[] { new double[] { 1, 2, 3 }, new double[] { .3, 1.5, -69 } };
+        SolutionMethodStub
+            .NewStub
+            .Accepting(typeof(double[]), typeof(double[]))
+            .Returning(TypeData.DummyType)
+            .PutInContext(_context);
+
+        var actualProcessedArguments = SUT_ProcessArguments(double.Parse, arguments).Invoke();
+
+        Assert.Equal(expectedProcessedArguments, actualProcessedArguments);
+    }
+
+    [Fact]
+    public void SolutionMethod_StringSequencesWithDifferentRanks_CorrectlyInterprets()
+    {
+        object?[]? arguments = new object[] { "[1, 2, 3]", "{ { .3, 1.5, -69 }, { -1, +.5 } }" };
+        object?[]? expectedProcessedArguments = new object[] {
+            new double[] { 1, 2, 3 },
+            new double[][] { new double[] {.3, 1.5, -69 }, new double[] { -1, .5 } }
+        };
+        SolutionMethodStub
+            .NewStub
+            .Accepting(typeof(double[]), typeof(double[][]))
+            .Returning(TypeData.DummyType)
+            .PutInContext(_context);
+
+        var actualProcessedArguments = SUT_ProcessArguments(double.Parse, arguments).Invoke();
+
+        Assert.Equal(expectedProcessedArguments, actualProcessedArguments);
+    }
+    
+    [Fact]
+    public void SolutionMethod_StringSequencesWithDifferentTypeElements_Throws()
+    {
+        object?[]? arguments = new object[] { "[1, 2, 3]", "{ { .3, 1.5, -69 }, { -1, +.5 } }" };
+        object?[]? expectedProcessedArguments = new object[] {
+            new int[] { 1, 2, 3 },
+            new double[][] { new double[] {.3, 1.5, -69 }, new double[] { -1, .5 } }
+        };
+        SolutionMethodStub
+            .NewStub
+            .Accepting(typeof(int[]), typeof(double[][]))
+            .Returning(TypeData.DummyType)
+            .PutInContext(_context);
+
+        Assert.Throws<ArgumentException>(SUT_ProcessArguments(int.Parse, arguments));
     }
 
 

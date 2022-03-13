@@ -11,14 +11,9 @@ namespace CCHelper.Core;
 internal abstract class SolutionMethod<TResult>
 {
     readonly object _solutionContainer;
-    object?[]? _arguments;
-
     readonly protected MethodInfo _method;
-    protected object?[]? Arguments
-    {
-        get => _arguments;
-        set => _arguments = new ArgumentsProcessor(_method, value).Process();
-    }
+
+    protected object?[]? Arguments { get; private set; }
     protected abstract Type ResultType { get; }
 
     /// <summary>
@@ -59,10 +54,10 @@ internal abstract class SolutionMethod<TResult>
         }
     }
 
-    internal TResult? Invoke(object?[]? arguments)
+    internal TResult? Invoke<TInterpreted>(object?[]? arguments, Func<string, TInterpreted> interpreter)
     {
-        Arguments = arguments;
-        var methodInfoResult = _method.Invoke(_solutionContainer, Arguments);
+        Arguments = new ArgumentsProcessor<TInterpreted>(_method, arguments, interpreter).Process();
+        var methodInfoReturnValue = _method.Invoke(_solutionContainer, Arguments);
 
         // EnsureResultTypeCompatibility() justifies the usage of the null-forgiving operator.
         return (TResult)RetrieveSolutionResult(methodInfoReturnValue)!;
