@@ -1,14 +1,19 @@
 ﻿using CCHelper.Services.ArgumentsProcessing.StringInterpreter;
 using CCHelper.Test.Framework.TestData;
 using System;
-using System.Collections.Generic;
 using Xunit;
 
 namespace CCHelper.Test.Tests.Units;
 
 public class TestStringSequenceInterpreter
 {
-    StringSequenceInterpreter SUT_StringSequenceInterpreter(string stringSequence) => new(stringSequence);
+    StringSequenceInterpreter<TInterpreted> SUT_StringSequenceInterpreter<TInterpreted>(
+        string stringSequence,
+        Func<string, TInterpreted> interpreter
+        )
+    {
+        return new(stringSequence, interpreter);
+    }
 
 
 
@@ -16,21 +21,21 @@ public class TestStringSequenceInterpreter
     [MemberData(nameof(StringSequenceData.Erroneous), MemberType = typeof(StringSequenceData))]
     public void ToEnumerable_StringWithInconsistentBrackets_Throws(string stringWithBrackets)
     {
-        Assert.Throws<ArgumentException>(() => SUT_StringSequenceInterpreter(stringWithBrackets).ToEnumerable());
+        Assert.Throws<ArgumentException>(() => SUT_StringSequenceInterpreter(stringWithBrackets, int.Parse).ToEnumerable());
     }
 
     [Theory]
     [MemberData(nameof(StringSequenceData.Erroneous), MemberType = typeof(StringSequenceData))]
     public void ToArray_StringWithInconsistentBrackets_Throws(string stringWithBrackets)
     {
-        Assert.Throws<ArgumentException>(() => SUT_StringSequenceInterpreter(stringWithBrackets).ToArray());
+        Assert.Throws<ArgumentException>(() => SUT_StringSequenceInterpreter(stringWithBrackets, int.Parse).ToArray());
     }
 
     [Theory]
     [MemberData(nameof(StringSequenceData.Erroneous), MemberType = typeof(StringSequenceData))]
     public void ToJaggedArray_StringWithInconsistentBrackets_Throws(string stringWithBrackets)
     {
-        Assert.Throws<ArgumentException>(() => SUT_StringSequenceInterpreter(stringWithBrackets).ToJaggedArray());
+        Assert.Throws<ArgumentException>(() => SUT_StringSequenceInterpreter(stringWithBrackets, int.Parse).ToJaggedArray());
     }
 
 
@@ -39,21 +44,21 @@ public class TestStringSequenceInterpreter
     [MemberData(nameof(StringSequenceData.Erroneous), MemberType = typeof(StringSequenceData))]
     public void ToEnumerable_UnsupportedString_Throws(string stringWithBrackets)
     {
-        Assert.Throws<ArgumentException>(() => SUT_StringSequenceInterpreter(stringWithBrackets).ToEnumerable());
+        Assert.Throws<ArgumentException>(() => SUT_StringSequenceInterpreter(stringWithBrackets, int.Parse).ToEnumerable());
     }
 
     [Theory]
     [MemberData(nameof(StringSequenceData.Erroneous), MemberType = typeof(StringSequenceData))]
     public void ToArray_UnsupportedString_Throws(string stringWithBrackets)
     {
-        Assert.Throws<ArgumentException>(() => SUT_StringSequenceInterpreter(stringWithBrackets).ToArray());
+        Assert.Throws<ArgumentException>(() => SUT_StringSequenceInterpreter(stringWithBrackets, int.Parse).ToArray());
     }
 
     [Theory]
     [MemberData(nameof(StringSequenceData.Erroneous), MemberType = typeof(StringSequenceData))]
     public void ToJaggedArray_UnsupportedString_Throws(string stringWithBrackets)
     {
-        Assert.Throws<ArgumentException>(() => SUT_StringSequenceInterpreter(stringWithBrackets).ToJaggedArray());
+        Assert.Throws<ArgumentException>(() => SUT_StringSequenceInterpreter(stringWithBrackets, int.Parse).ToJaggedArray());
     }
 
 
@@ -62,21 +67,21 @@ public class TestStringSequenceInterpreter
     [MemberData(nameof(StringSequenceData.Empty), MemberType = typeof(StringSequenceData))]
     public void ToEnumerable_EmptyString_Throws(string stringWithBrackets)
     {
-        Assert.Throws<InvalidOperationException>(() => SUT_StringSequenceInterpreter(stringWithBrackets).ToEnumerable());
+        Assert.Throws<InvalidOperationException>(() => SUT_StringSequenceInterpreter(stringWithBrackets, int.Parse).ToEnumerable());
     }
 
     [Theory]
     [MemberData(nameof(StringSequenceData.Empty), MemberType = typeof(StringSequenceData))]
     public void ToArray_EmptyString_Throws(string stringWithBrackets)
     {
-        Assert.Throws<InvalidOperationException>(() => SUT_StringSequenceInterpreter(stringWithBrackets).ToArray());
+        Assert.Throws<InvalidOperationException>(() => SUT_StringSequenceInterpreter(stringWithBrackets, int.Parse).ToArray());
     }
 
     [Theory]
     [MemberData(nameof(StringSequenceData.Empty), MemberType = typeof(StringSequenceData))]
     public void ToJaggedArray_EmptyString_Throws(string stringWithBrackets)
     {
-        Assert.Throws<InvalidOperationException>(() => SUT_StringSequenceInterpreter(stringWithBrackets).ToJaggedArray());
+        Assert.Throws<InvalidOperationException>(() => SUT_StringSequenceInterpreter(stringWithBrackets, int.Parse).ToJaggedArray());
     }
 
 
@@ -85,7 +90,7 @@ public class TestStringSequenceInterpreter
     [MemberData(nameof(StringSequenceData.NonJagged), MemberType = typeof(StringSequenceData))]
     public void AppropriateInterpreter_StringSequence_ReturnsToArray(string stringSequence, int[] _)
     {
-        var sut = SUT_StringSequenceInterpreter(stringSequence);
+        var sut = SUT_StringSequenceInterpreter(stringSequence, int.Parse);
         var appropriateInterpreter = sut.AppropriateInterpreter;
 
         Assert.Equal(sut.ToArray, appropriateInterpreter);
@@ -95,7 +100,7 @@ public class TestStringSequenceInterpreter
     [MemberData(nameof(StringSequenceData.Jagged), MemberType = typeof(StringSequenceData))]
     public void AppropriateInterpreter_JaggedStringSequence_ReturnsToJaggedArray(string stringSequence, int[][] _)
     {
-        var sut = SUT_StringSequenceInterpreter(stringSequence);
+        var sut = SUT_StringSequenceInterpreter(stringSequence, int.Parse);
         var appropriateInterpreter = sut.AppropriateInterpreter;
 
         Assert.Equal(sut.ToJaggedArray, appropriateInterpreter);
@@ -107,20 +112,30 @@ public class TestStringSequenceInterpreter
     [MemberData(nameof(StringSequenceData.NonJagged), MemberType = typeof(StringSequenceData))]
     public void ToEnumerable_StringSequence_ReturnsInterpretedSequence(string stringSequence, int[] interpretedSequence)
     {
-        Assert.Equal(interpretedSequence, SUT_StringSequenceInterpreter(stringSequence).ToEnumerable());
+        Assert.Equal(interpretedSequence, SUT_StringSequenceInterpreter(stringSequence, int.Parse).ToEnumerable());
     }
 
     [Theory]
     [MemberData(nameof(StringSequenceData.NonJagged), MemberType = typeof(StringSequenceData))]
     public void ToArray_StringSequence_ReturnsInterpretedSequence(string stringSequence, int[] interpretedSequence)
     {
-        Assert.Equal(interpretedSequence, SUT_StringSequenceInterpreter(stringSequence).ToArray());
+        Assert.Equal(interpretedSequence, SUT_StringSequenceInterpreter(stringSequence, int.Parse).ToArray());
     }
 
     [Theory]
     [MemberData(nameof(StringSequenceData.Jagged), MemberType = typeof(StringSequenceData))]
     public void ToJaggedArray_StringSequence_ReturnsInterpretedSequence(string stringSequence, int[][] interpretedSequence)
     {
-        Assert.Equal(interpretedSequence, SUT_StringSequenceInterpreter(stringSequence).ToJaggedArray());
+        Assert.Equal(interpretedSequence, SUT_StringSequenceInterpreter(stringSequence, int.Parse).ToJaggedArray());
+    }
+
+
+
+    [Theory]
+    [InlineData(new object[] { "{ 3.0, 4.2, 17.5 }", new double[] { 3.0, 4.2, 17.5 } })]
+    [InlineData(new object[] { "{ -.0, .2, -17.5 }", new double[] { .0, +.2, -17.5 } })]
+    public void ToArray_StringSequenceOfDoubles_ReturnsInterpretedSequence(string stringSequence, double[] interpretedSequence)
+    {
+        Assert.Equal(interpretedSequence, SUT_StringSequenceInterpreter(stringSequence, double.Parse).ToArray());
     }
 }

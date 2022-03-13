@@ -2,18 +2,19 @@
 
 namespace CCHelper.Services.ArgumentsProcessing.StringInterpreter;
 
-internal class StringSequenceInterpreter
+public class StringSequenceInterpreter<TInterpreted>
 {
     readonly string _stringSequence;
     readonly Brackets _brackets;
     const string _elementsCapturingGroup = "elements";
+    readonly Func<string, TInterpreted> _interpreter;
 
     Regex? _sequenceRegex;
     Regex SequenceRegex => _sequenceRegex ??= new(
         $@"\{_brackets.OpeningBracket}\s*
         (?<{_elementsCapturingGroup}>
             (
-                (?<digit>[-+]?\d+)
+                (?<digit>[-+]?( \d+ | \.\d+ ))  # To allow nulls, the casting step requires additional check for nulls as well.
                 (?<separator>\s*,\s*)?
             )+  # Wraps elemenets as an integral whole.
         )
@@ -31,11 +32,12 @@ internal class StringSequenceInterpreter
             throw new ArgumentException("The string sequence has invalid format.", nameof(_stringSequence));
         }
     }
-
-    internal StringSequenceInterpreter(string stringSequence)
+    // Define either the additional parameter for the separator with the default value or a separate constructor altogether.
+    public StringSequenceInterpreter(string stringSequence, Func<string, TInterpreted> interpreter)
     {
         _stringSequence = stringSequence.Trim();
         _brackets = RetrieveBracketsFromStringSequence();
+        _interpreter = interpreter;
     }
     Brackets RetrieveBracketsFromStringSequence()
     {
@@ -45,7 +47,7 @@ internal class StringSequenceInterpreter
         throw new ArgumentException("Exception occured when trying to retrieve brackets.", nameof(_stringSequence));
     }
 
-    internal Func<object> AppropriateInterpreter => Dimensions > 1 ? ToJaggedArray : ToArray;
+    public Func<object> AppropriateInterpreter => Dimensions > 1 ? ToJaggedArray : ToArray;
 
     int _dimensions;
     int Dimensions
@@ -69,24 +71,24 @@ internal class StringSequenceInterpreter
         }
     }
 
-    internal int[] ToArray()
+    public TInterpreted[] ToArray()
     {
         return ToEnumerable().ToArray();
     }
 
-    internal IEnumerable<int> ToEnumerable()
+    public IEnumerable<TInterpreted> ToEnumerable()
     {
         var parsedOutStringSequence = ParsedOutStringSequences.Single();
         return InterpretSequence(parsedOutStringSequence);
     }
 
-    internal int[][] ToJaggedArray()
+    public TInterpreted[][] ToJaggedArray()
     {
-        var jaggedArray = new int[ParsedOutStringSequences.Count][];
+        var jaggedArray = new TInterpreted[ParsedOutStringSequences.Count][];
         FillJaggedArray(jaggedArray);
         return jaggedArray;
     }
-    void FillJaggedArray(int[][] jaggedArray)
+    void FillJaggedArray(TInterpreted[][] jaggedArray)
     {
         var dimension = 0;
         foreach (Match parsedOutStringSequence in ParsedOutStringSequences)
@@ -96,23 +98,23 @@ internal class StringSequenceInterpreter
         }
     }
 
-    static IEnumerable<int> InterpretSequence(Match parsedOutStringSequence)
+    IEnumerable<TInterpreted> InterpretSequence(Match parsedOutStringSequence)
     {
-        return CastStringElementsToInt(GetStringSequenceElements(parsedOutStringSequence));
+        return CastStringElements(GetStringSequenceElements(parsedOutStringSequence));
     }
 
-    static string[] GetStringSequenceElements(Match parsedOutStringSequence)
+    string[] GetStringSequenceElements(Match parsedOutStringSequence)
     {
         return SplitUnwrappedElements(parsedOutStringSequence.Groups[_elementsCapturingGroup].Value);
     }
 
-    static string[] SplitUnwrappedElements(string unwrappedStringSequence)
+    string[] SplitUnwrappedElements(string unwrappedStringSequence)
     {
         return unwrappedStringSequence.Split(',', StringSplitOptions.TrimEntries);
     }
 
-    static IEnumerable<int> CastStringElementsToInt(string[] stringElements)
+    IEnumerable<TInterpreted> CastStringElements(string[] stringElements)
     {
-        return stringElements.Select(stringElement => int.Parse(stringElement));
+        return stringElements.Select(stringElement => _interpreter(stringElement));
     }
 }
