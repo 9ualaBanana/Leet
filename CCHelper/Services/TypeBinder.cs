@@ -11,11 +11,13 @@ internal static class TypeBinder
 
         return CanBind(argumentType, parameterType);
     }
+
     internal static bool CanBind(Type? originType, Type targetType)
     {
         if (originType is null) return CanHoldNull(targetType);
         return originType.IsAssignableTo(targetType);
     }
+
     internal static bool CanHoldNull(Type parameterType)
     {
         return !parameterType.IsValueType || Nullable.GetUnderlyingType(parameterType) is not null;
