@@ -9,10 +9,13 @@ internal class OutputSolution<TResult> : SolutionMethod<TResult>
     internal OutputSolution(MethodInfo method, object solutionContainer) 
         : base(method, solutionContainer)
     {
-        EnsureResultsTypesCompatibility();
     }
 
-    protected override object? RetrieveSolutionMethodSpecificResult(object? methodInfoResult)
+    protected override void Init()
+    {
+    }
+
+    protected override object? RetrieveSolutionResult(object? methodInfoResult)
     {
         return methodInfoResult;
     }
