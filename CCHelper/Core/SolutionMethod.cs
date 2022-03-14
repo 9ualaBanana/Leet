@@ -7,7 +7,7 @@ namespace CCHelper.Core;
 /// <summary>
 /// The base class that is inherited by concrete solution method implementations.
 /// </summary>
-/// <typeparam name="TResult">the type of the solution result.</typeparam>
+/// <typeparam name="TResult">The type of the solution result.</typeparam>
 internal abstract class SolutionMethod<TResult>
 {
     readonly object _solutionContainer;
@@ -22,8 +22,8 @@ internal abstract class SolutionMethod<TResult>
     /// only for calling this base constructor.<br/>
     /// The actual specific construction logic must be defined inside <see cref="Init"/>.
     /// </summary>
-    /// <param name="method">the actual method definition.</param>
-    /// <param name="solutionContainer">the instance of the type in which the <paramref name="method"/> is defined.</param>
+    /// <param name="method">The actual method definition.</param>
+    /// <param name="solutionContainer">The instance of the type in which the <paramref name="method"/> is defined.</param>
     protected SolutionMethod(MethodInfo method, object solutionContainer)
     {
         _solutionContainer = solutionContainer;

@@ -32,7 +32,7 @@ public class StringSequenceInterpreter<TInterpreted>
             throw new ArgumentException("The string sequence has invalid format.", nameof(_stringSequence));
         }
     }
-    // Define either the additional parameter for the separator with the default value or a separate constructor altogether.
+
     public StringSequenceInterpreter(string stringSequence, Func<string, TInterpreted> interpreter)
     {
         _stringSequence = stringSequence.Trim();
