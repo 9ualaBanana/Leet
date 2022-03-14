@@ -18,7 +18,7 @@ public class StringSequenceInterpreter<TInterpreted>
                 (?<separator>\s*,\s*)?
             )+  # Wraps elemenets as an integral whole.
         )
-        \s*{_brackets.ClosingBracket}",
+        \s*\{_brackets.ClosingBracket}",
         RegexOptions.IgnorePatternWhitespace | RegexOptions.ExplicitCapture
         );
     MatchCollection? _parsedOutStringSequences;
