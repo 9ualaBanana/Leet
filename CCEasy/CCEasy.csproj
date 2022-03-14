@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Product>CCEasy</Product>
+    <Company>GualaBanana</Company>
+    <Authors>GualaBanana</Authors>
+    <Version>1.5.2</Version>
+    <Description>Tackling Coding Challenge solutions in the IDE of your choice has never been easier.</Description>
+    <RepositoryUrl>https://github.com/GualaBanana/CCEasy</RepositoryUrl>
+    <PackageTags>environment; framework; kata; leetcode; testing-tools; utility-library; leetcode-solutions; coding-challenges; leetcode-csharp; practice-programming; arrays-and-strings;</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+	  <InternalsVisibleTo Include="CCEasy.Test" />
+  </ItemGroup>
+
+</Project>
