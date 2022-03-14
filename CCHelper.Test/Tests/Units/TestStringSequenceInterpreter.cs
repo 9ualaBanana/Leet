@@ -132,8 +132,7 @@ public class TestStringSequenceInterpreter
 
 
     [Theory]
-    [InlineData(new object[] { "{ 3.0, 4.2, 17.5 }", new double[] { 3.0, 4.2, 17.5 } })]
-    [InlineData(new object[] { "{ -.0, .2, -17.5 }", new double[] { .0, +.2, -17.5 } })]
+    [MemberData(nameof(StringSequenceData.NonJaggedDouble), MemberType = typeof(StringSequenceData))]
     public void ToArray_StringSequenceOfDoubles_ReturnsInterpretedSequence(string stringSequence, double[] interpretedSequence)
     {
         Assert.Equal(interpretedSequence, SUT_StringSequenceInterpreter(stringSequence, double.Parse).ToArray());

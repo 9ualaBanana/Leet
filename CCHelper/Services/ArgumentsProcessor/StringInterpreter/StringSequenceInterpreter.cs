@@ -14,7 +14,7 @@ public class StringSequenceInterpreter<TInterpreted>
         $@"\{_brackets.OpeningBracket}\s*
         (?<{_elementsCapturingGroup}>
             (
-                (?<digit>[-+]?( \d+ | \.\d+ ))  # To allow nulls, the casting step requires additional check for nulls as well.
+                (?<digit>[-+]?( \d+ | \d+\.\d+ | \.\d+ ))
                 (?<separator>\s*,\s*)?
             )+  # Wraps elemenets as an integral whole.
         )

@@ -76,7 +76,6 @@ internal static class StringSequenceData
             {
                 " [ 1, 10, 30, -100, 20 ] ", new int[] {1, 10, 30, -100, 20 }
             };
-
         }
     }
 
@@ -111,6 +110,33 @@ internal static class StringSequenceData
             yield return new object[]
             {
                 "  [ [1, 25] , [ 3 ], [74]  ] ", new int[][] { new int[] { 1, 25 }, new int[] { 3 }, new int[] { 74 } }
+            };
+        }
+    }
+
+    public static IEnumerable<object[]> NonJaggedDouble
+    {
+        get
+        {
+            yield return new object[]
+            {
+                " [ .1, +175.10, 30.0, -100.1, -.20 ] ", new double[] {.1, 175.10, 30.0, -100.1, -.20 }
+            };
+            yield return new object[]
+            {
+                "[-.4]", new double[] { -.4 }
+            };
+            yield return new object[]
+            {
+                "[+.4]", new double[] { .4 }
+            };
+            yield return new object[]
+            {
+                "[-.4, 15.0]", new double[] { -.4, 15 }
+            };
+            yield return new object[]
+            {
+                "[5.4, -15]", new double[] { 5.4, -15 }
             };
         }
     }

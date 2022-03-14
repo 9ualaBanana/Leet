@@ -250,6 +250,23 @@ public class TestArgumentsProcessor : DynamicContextFixture
 
         Assert.Equal(expectedProcessedArguments, actualProcessedArguments);
     }
+    
+    [Theory]
+    [MemberData(nameof(StringSequenceData.NonJaggedDouble), MemberType = typeof(StringSequenceData))]
+    public void SolutionMethod_StringSequenceWithDoubleParameters_CorrectlyInterprets(string stringSequence, double[] interpretedSequence)
+    {
+        object?[]? arguments = new object[] { stringSequence };
+        object?[]? expectedProcessedArguments = new object[] { interpretedSequence };
+        SolutionMethodStub
+            .NewStub
+            .Accepting(typeof(double[]))
+            .Returning(TypeData.DummyType)
+            .PutInContext(_context);
+
+        var actualProcessedArguments = SUT_ProcessArguments(double.Parse, arguments).Invoke();
+
+        Assert.Equal(expectedProcessedArguments, actualProcessedArguments);
+    }
 
     [Fact]
     public void SolutionMethod_StringSequencesWithDifferentRanks_CorrectlyInterprets()
