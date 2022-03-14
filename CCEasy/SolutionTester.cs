@@ -8,7 +8,7 @@ namespace CCEasy;
 /// </summary>
 /// <typeparam name="TSolutionContainer">The type where the solution method is defined.</typeparam>
 /// <typeparam name="TResult">The result type of the solution method.</typeparam>
-public class SolutionTester<TSolutionContainer, TResult> where TSolutionContainer : class, new()
+public class SolutionTester<TSolutionContainer, TResult> where TSolutionContainer : new()
 {
     readonly SolutionMethod<TResult> _solutionMethod;
     readonly SolutionResultPresenter _resultPresenter;
