@@ -5,42 +5,52 @@ namespace CCHelper.Services;
 
 internal class SolutionResultPresenter
 {
-    readonly object _expectedResult;
-    readonly object _actualResult;
-
-    internal SolutionResultPresenter(object expectedResult, object actualResult)
+    Stream _outputStream = Console.OpenStandardOutput();
+    internal Stream OutputStream
     {
-        _expectedResult = expectedResult;
-        _actualResult = actualResult;
+        get => _outputStream;
+        set
+        {
+            _resultWriter = null;
+            _outputStream = value;
+        }
+    }
+    StreamWriter? _resultWriter;
+    StreamWriter _ResultWriter => _resultWriter ??= new(OutputStream);
+
+    internal void DisplayResults(object? expected, object? actual)
+    {
+        if (_ResultWriter.BaseStream.CanSeek) _ResultWriter.BaseStream.Seek(0, SeekOrigin.End);
+        _ResultWriter.WriteLine($"{"Expected:", -10} {GetDisplayableRepresentation(expected)}");
+        _ResultWriter.WriteLine($"{"Actual:", -10} {GetDisplayableRepresentation(actual)}");
+        _ResultWriter.WriteLine();
+        _ResultWriter.Close();
     }
 
-    internal void DisplayResults()
+    static string GetDisplayableRepresentation(object? value) => value switch
     {
-        Console.WriteLine($"{"Expected:", -10} {GetDisplayable(_expectedResult!)}");
-        Console.WriteLine($"{"Actual:", -10} {GetDisplayable(_actualResult!)}");
-    }
-    
-    string GetDisplayable(object value)
-    {
-        Guard.Against.Null(value, nameof(value));
+        null => "null",
+        IEnumerable enumerable => GetDisplayableEnumerable(enumerable),
+        _ => value.ToString()!
+    };
 
-        if (value is not IEnumerable) return value.ToString()!;
-        
-        return GetDisplayableSequence((IEnumerable)value); ;
-    }
-    string GetDisplayableSequence(IEnumerable sequence)
+    static string GetDisplayableEnumerable(IEnumerable sequence)
     {
+        var length = 0;
+        foreach (var element in sequence) length++;
+
         var displayableSequence = new StringBuilder();
         displayableSequence.Append("[ ");
         foreach (var element in sequence)
         {
-            var displayableElement = element is IEnumerable subSequence ? GetDisplayableSequence(subSequence) : element;
+            var displayableElement = GetDisplayableRepresentation(element);
             displayableSequence.Append(displayableElement);
+
+            if (length == 1) break;
             displayableSequence.Append(", ");
+            length--;
         }
-        RemoveLastSeparator(displayableSequence);
         displayableSequence.Append(" ]");
         return displayableSequence.ToString();
     }
-    static void RemoveLastSeparator(StringBuilder displayableSequence) => displayableSequence.Remove(displayableSequence.Length - 2, 2);
 }
