@@ -111,6 +111,11 @@ internal static class StringSequenceData
             {
                 "  [ [1, 25] , [ 3 ], [74]  ] ", new int[][] { new int[] { 1, 25 }, new int[] { 3 }, new int[] { 74 } }
             };
+            yield return new object[]
+            {
+                "( ( 4, 3 ), (69, 5 ) )", new int[][] { new int[] { 4, 3 }, new int[] { 69, 5 } }
+            };
+
         }
     }
 
