@@ -2,6 +2,10 @@
 
 namespace CCEasy.Services.StringInterpreter;
 
+/// <summary>
+/// Provides the means for retrieving objects derived from <see cref="IEnumerable{T}"/> represented as <see cref="string"/>.
+/// </summary>
+/// <typeparam name="TInterpreted">The type of elements of the resulting objects derived from <see cref="IEnumerable{T}"/>.</typeparam>
 public class CollectionInStringInterpreter<TInterpreted>
 {
     readonly string _collectionInString;
@@ -33,9 +37,15 @@ public class CollectionInStringInterpreter<TInterpreted>
         }
     }
 
-    public CollectionInStringInterpreter(string stringSequence, Func<string, TInterpreted> interpreter)
+    /// <summary>
+    /// Instantiates the <see cref="CollectionInStringInterpreter{TInterpreted}"/> object that allows retrieving
+    /// objects derived from <see cref="IEnumerable{T}"/> represented by <paramref name="collectionInString"/>.
+    /// </summary>
+    /// <param name="collectionInString">The <see cref="string"/> representing <see cref="IEnumerable{T}"/> in text form.</param>
+    /// <param name="interpreter">The delegate used for casting the resulting elements to <typeparamref name="TInterpreted"/>.</param>
+    public CollectionInStringInterpreter(string collectionInString, Func<string, TInterpreted> interpreter)
     {
-        _collectionInString = stringSequence.Trim();
+        _collectionInString = collectionInString.Trim();
         _brackets = RetrieveBracketsFromCollectionInString();
         _interpreter = interpreter;
     }
@@ -48,7 +58,7 @@ public class CollectionInStringInterpreter<TInterpreted>
     }
 
     /// <summary>
-    /// Tries to perform in-place conversion of the sequence represented by <see cref="string"/> inside <paramref name="argument"/>
+    /// Tries to perform in-place conversion of the enumerable represented as <see cref="string"/> inside <paramref name="argument"/>
     /// to a valid C# collection<br/> applying <paramref name="interpreter"/> to each element.
     /// </summary>
     public static void TryInterpret(ref object? argument, Func<string, TInterpreted> interpreter)
@@ -86,17 +96,24 @@ public class CollectionInStringInterpreter<TInterpreted>
         }
     }
 
+    /// <returns>The array retrieved from the <see cref="string"/>.</returns>
     public TInterpreted[] ToArray()
     {
         return ToEnumerable().ToArray();
     }
 
+    /// <returns>The enumerable retrieved from the <see cref="string"/>.</returns>
     public IEnumerable<TInterpreted> ToEnumerable()
     {
         var parsedOutCollectionInString = ParsedOutCollectionsInString.Single();
         return InterpretCollection(parsedOutCollectionInString);
     }
 
+    /// <remarks>
+    /// If the <see cref="string"/> represents a regular array, the resulting object will be a jagged array
+    /// with the first element being that retrieved array.
+    /// </remarks>
+    /// <returns>The jagged array retrieved from the <see cref="string"/>.</returns>
     public TInterpreted[][] ToJaggedArray()
     {
         var jaggedArray = new TInterpreted[ParsedOutCollectionsInString.Count][];

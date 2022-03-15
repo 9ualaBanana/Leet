@@ -5,7 +5,7 @@ using CCEasy.SolutionMethods;
 namespace CCEasy;
 
 /// <summary>
-/// Provides an interface for exercising solution methods.
+/// Provides the interface for exercising solution methods.
 /// </summary>
 /// <typeparam name="TSolutionContainer">The type where the solution method is defined.</typeparam>
 /// <typeparam name="TResult">The result type of the solution method.</typeparam>
@@ -25,7 +25,7 @@ public class SolutionTester<TSolutionContainer, TResult> where TSolutionContaine
     }
 
     /// <summary>
-    /// Instantiates the tester for <see cref="SolutionMethod{TResult}"/> defined inside <paramref name="solutionContainer"/>.
+    /// Instantiates the tester for the solution method defined inside <paramref name="solutionContainer"/>.
     /// </summary>
     /// <remarks>
     /// The solution method must have a public access modifier.
@@ -38,22 +38,22 @@ public class SolutionTester<TSolutionContainer, TResult> where TSolutionContaine
     }
 
     /// <summary>
-    /// <inheritdoc cref="Test{TInterpreted}(TResult, Func{string, TInterpreted}, object?[]?)"/>
+    /// The interface for exercising the associated solution method.
     /// </summary>
-    /// <param name="expected"><inheritdoc cref="Test{TInterpreted}(TResult, Func{string, TInterpreted}, object?[]?)"/></param>
-    /// <param name="arguments"><inheritdoc cref="Test{TInterpreted}(TResult, Func{string, TInterpreted}, object?[]?)"/></param>
+    /// <param name="expected">The expected result of solution method.</param>
+    /// <param name="arguments">The arguments to the solution method being tested.</param>
     public void Test(TResult expected, params object?[]? arguments)
     {
         Test(expected, int.Parse, arguments);
     }
 
     /// <summary>
-    /// <inheritdoc cref="Test{TInterpreted}(TResult, Func{string, TInterpreted}, object?[]?)"/>
+    /// The interface for exercising the associated solution method.
     /// </summary>
-    /// <typeparam name="TInterpreted"><inheritdoc cref="Test{TInterpreted}(TResult, Func{string, TInterpreted}, object?[]?)"/></typeparam>
-    /// <param name="expected"><inheritdoc cref="Test{TInterpreted}(TResult, Func{string, TInterpreted}, object?[]?)"/></param>
-    /// <param name="interpreter"><inheritdoc cref="Test{TInterpreted}(TResult, Func{string, TInterpreted}, object?[]?)"/></param>
-    /// <param name="arguments"><inheritdoc cref="Test{TInterpreted}(TResult, Func{string, TInterpreted}, object?[]?)"/></param>
+    /// <typeparam name="TInterpreted">The type of the elements inside the collection represented by <see cref="string"/> argument.</typeparam>
+    /// <param name="expected">The expected result of the solution method.</param>
+    /// <param name="interpreter">The delegate used for casting the elements inside the collection represented by <see cref="string"/> argument.</param>
+    /// <param name="arguments">The arguments to the solution method being tested.</param>
     public void Test<TInterpreted>(object? expected, Func<string, TInterpreted> interpreter, params object?[]? arguments)
     {
         CollectionInStringInterpreter<TInterpreted>.TryInterpret(ref expected, interpreter);
@@ -62,12 +62,12 @@ public class SolutionTester<TSolutionContainer, TResult> where TSolutionContaine
     }
 
     /// <summary>
-    /// The interface for exercising the associated <see cref="SolutionMethod{TResult}"/>.
+    /// The interface for exercising the associated solution method.
     /// </summary>
     /// <typeparam name="TInterpreted">The type of the elements inside the collection represented by <see cref="string"/> argument.</typeparam>
-    /// <param name="expected">The expected result of <see cref="SolutionMethod{TResult}"/>.</param>
+    /// <param name="expected">The expected result of the solution method.</param>
     /// <param name="interpreter">The delegate used for casting the elements inside the collection represented by <see cref="string"/> argument.</param>
-    /// <param name="arguments">The arguments to the <see cref="SolutionMethod{TResult}"/> being tested.</param>
+    /// <param name="arguments">The arguments to the solution method being tested.</param>
     public void Test<TInterpreted>(TResult expected, Func<string, TInterpreted> interpreter, params object?[]? arguments)
     {
         var actual = _solutionMethod.Invoke(arguments, interpreter);
