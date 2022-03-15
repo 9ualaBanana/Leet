@@ -12,6 +12,7 @@
     <RepositoryUrl>https://github.com/GualaBanana/CCEasy</RepositoryUrl>
     <PackageTags>environment; framework; kata; leetcode; testing-tools; utility-library; leetcode-solutions; coding-challenges; leetcode-csharp; practice-programming; arrays-and-strings;</PackageTags>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup>
