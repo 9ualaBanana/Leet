@@ -4,7 +4,7 @@
 ## 👋🏼 Welcome!
 Anyone who's ever worked in code editors like the one provided by LeetCode knows that it's quite a challenge in itself.
 **No debugger** or **IntelliSense** support make it completely **useless** except for auto-testing your solution with necessary inputs.
-In case of a bug that'll inevitably crop up in your solution, you'll be forced to switch to an actual IDE *anyway*.
+In case of a bug that'll inevitably crop up, you'll be forced to switch to an actual IDE *anyway*.
 
 But it's *arguably* a more convenient option because now you are faced with **other issues**:
 * *constructing necessary objects*
