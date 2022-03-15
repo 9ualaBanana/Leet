@@ -30,6 +30,7 @@ internal class SolutionResultPresenter
     static string GetDisplayableRepresentation(object? value) => value switch
     {
         null => "null",
+        string string_ => "\"" + string_ + "\"",
         IEnumerable enumerable => GetDisplayableEnumerable(enumerable),
         _ => value.ToString()!
     };
