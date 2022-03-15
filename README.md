@@ -2,9 +2,9 @@
 <p align="center"><em> Tackling Coding Challenge solutions in the IDE of your choice has never been easier. </em></p>
 
 ## 👋🏼 Welcome!
-Anyone who's ever worked in code editors like the one provided by LeetCode knows that it's quite a challenge in itself.<br/>
-**No debugger** or **IntelliSense** support make it completely **useless** except for auto-testing your solution with necessary inputs.<br/> 
-In case of a bug that'll inevitably crop up in your solution, you'll be forced to switch to an actual IDE *anyway*.
+Anyone who's ever worked in code editors like the one provided by LeetCode knows that it's quite a challenge in itself.
+**No debugger** or **IntelliSense** support make it completely **useless** except for auto-testing your solution with necessary inputs.
+In case of a bug that'll inevitably crop up, you'll be forced to switch to an actual IDE *anyway*.
 
 But it's *arguably* a more convenient option because now you are faced with **other issues**:
 * *constructing necessary objects*
@@ -12,10 +12,10 @@ But it's *arguably* a more convenient option because now you are faced with **ot
 * *validating the results*
 * *providing the input data...*
 
-...especially **arrays** that are **ubiquitous** in those challenges, and only their construction **alone** takes a **significant** amount of time.<br/>
+...especially **arrays** that are **ubiquitous** in those challenges, and only their construction **alone** takes a **significant** amount of time.
 And what if they are **jagged**?.. \**sigh*\*
 
-***CCEasy*** is designed to make working on solutions in your favorite IDE **trivial** avoiding all the common inconveniences  related to that.<br/>
+***CCEasy*** is designed to make working on solutions in your favorite IDE **trivial** avoiding all the common inconveniences  related to that.
 
 ## 🥗 Recipes
 ### 🟢 Let It Help You
