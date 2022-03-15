@@ -1,4 +1,4 @@
-﻿using CCEasy.Core;
+﻿using CCEasy.SolutionMethods;
 using System.Reflection;
 
 namespace CCEasy.Services;

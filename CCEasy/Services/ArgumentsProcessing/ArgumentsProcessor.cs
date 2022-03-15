@@ -1,5 +1,5 @@
 ﻿using System.Reflection;
-using CCEasy.Services.ArgumentsProcessing.StringInterpreter;
+using CCEasy.Services.StringInterpreter;
 
 namespace CCEasy.Services.ArgumentsProcessing;
 
@@ -64,7 +64,7 @@ internal class ArgumentsProcessor<TInterpreted>
             ref var correspondingArgument = ref _arguments[parameter.Position];
             if (TypeBinder.ArgumentCanBindToParameter(correspondingArgument, parameter)) continue;
 
-            TryInterpretPotentialStringSequenceArgument(ref correspondingArgument);
+            CollectionInStringInterpreter<TInterpreted>.TryInterpret(ref correspondingArgument, _interpreter);
 
             if (TypeBinder.ArgumentCanBindToParameter(correspondingArgument, parameter)) continue;
 
@@ -72,19 +72,5 @@ internal class ArgumentsProcessor<TInterpreted>
             var parameterInfo = $"{parameter.Name} <{parameter.ParameterType}>";
             throw new ArgumentException($"The argument [{argumentInfo}] can't bind to the parameter [{parameterInfo}]");
         }
-    }
-
-    /// <summary>
-    /// Converts the sequence represented by the string to a valid C# collection.
-    /// </summary>
-    void TryInterpretPotentialStringSequenceArgument(ref object? argument)
-    {
-        if (argument?.GetType() != typeof(string)) return;
-
-        try
-        {
-            argument = new StringSequenceInterpreter<TInterpreted>(argument.ToString()!, _interpreter).AppropriateInterpreter();
-        }
-        catch (Exception) { }
     }
 }

@@ -1,12 +1,12 @@
 ﻿using System.Reflection;
 
-namespace CCEasy.Core;
+namespace CCEasy.SolutionMethods;
 
 internal class OutputSolution<TResult> : SolutionMethod<TResult>
 {
     protected override Type ResultType => _method.ReturnType;
 
-    internal OutputSolution(MethodInfo method, object solutionContainer) 
+    internal OutputSolution(MethodInfo method, object solutionContainer)
         : base(method, solutionContainer)
     {
     }

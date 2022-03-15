@@ -1,5 +1,6 @@
-﻿using CCEasy.Core;
-using CCEasy.Services;
+﻿using CCEasy.Services;
+using CCEasy.Services.StringInterpreter;
+using CCEasy.SolutionMethods;
 
 namespace CCEasy;
 
@@ -47,11 +48,25 @@ public class SolutionTester<TSolutionContainer, TResult> where TSolutionContaine
     }
 
     /// <summary>
+    /// <inheritdoc cref="Test{TInterpreted}(TResult, Func{string, TInterpreted}, object?[]?)"/>
+    /// </summary>
+    /// <typeparam name="TInterpreted"><inheritdoc cref="Test{TInterpreted}(TResult, Func{string, TInterpreted}, object?[]?)"/></typeparam>
+    /// <param name="expected"><inheritdoc cref="Test{TInterpreted}(TResult, Func{string, TInterpreted}, object?[]?)"/></param>
+    /// <param name="interpreter"><inheritdoc cref="Test{TInterpreted}(TResult, Func{string, TInterpreted}, object?[]?)"/></param>
+    /// <param name="arguments"><inheritdoc cref="Test{TInterpreted}(TResult, Func{string, TInterpreted}, object?[]?)"/></param>
+    public void Test<TInterpreted>(object? expected, Func<string, TInterpreted> interpreter, params object?[]? arguments)
+    {
+        CollectionInStringInterpreter<TInterpreted>.TryInterpret(ref expected, interpreter);
+        TypeBinder.CanBind(expected?.GetType(), typeof(TResult));
+        Test((TResult)expected!, interpreter, arguments);
+    }
+
+    /// <summary>
     /// The interface for exercising the associated <see cref="SolutionMethod{TResult}"/>.
     /// </summary>
-    /// <typeparam name="TInterpreted">The type of the elements inside the sequence represented by <see cref="string"/> argument.</typeparam>
+    /// <typeparam name="TInterpreted">The type of the elements inside the collection represented by <see cref="string"/> argument.</typeparam>
     /// <param name="expected">The expected result of <see cref="SolutionMethod{TResult}"/>.</param>
-    /// <param name="interpreter">The delegate used for casting the elements inside the sequence represented by <see cref="string"/> argument.</param>
+    /// <param name="interpreter">The delegate used for casting the elements inside the collection represented by <see cref="string"/> argument.</param>
     /// <param name="arguments">The arguments to the <see cref="SolutionMethod{TResult}"/> being tested.</param>
     public void Test<TInterpreted>(TResult expected, Func<string, TInterpreted> interpreter, params object?[]? arguments)
     {

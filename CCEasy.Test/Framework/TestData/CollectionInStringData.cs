@@ -2,7 +2,7 @@
 
 namespace CCEasy.Test.Framework.TestData;
 
-internal static class StringSequenceData
+internal static class CollectionInStringData
 {
     public static IEnumerable<object[]> NonJagged
     {

@@ -2,7 +2,7 @@
 using CCEasy.Services.ArgumentsProcessing;
 using System.Reflection;
 
-namespace CCEasy.Core;
+namespace CCEasy.SolutionMethods;
 
 /// <summary>
 /// The base class that is inherited by concrete solution method implementations.
@@ -38,7 +38,7 @@ internal abstract class SolutionMethod<TResult>
     protected abstract void Init();
 
     /// <summary>
-    /// The constraint that satisfies both reference and nullable types doesn't exist.<br/> 
+    /// The constraint that satisfies both reference and nullable types doesn't exist.<br/>
     /// This method checks at runtime that <typeparamref name="TResult"/> conforms to these constraints.
     /// </summary>
     /// <remarks>

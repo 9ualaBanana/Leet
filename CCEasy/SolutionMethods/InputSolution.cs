@@ -1,14 +1,14 @@
 ﻿using System.Reflection;
 
-namespace CCEasy.Core;
+namespace CCEasy.SolutionMethods;
 
 internal class InputSolution<TResult> : SolutionMethod<TResult>
 {
     ParameterInfo _resultParameter = null!;
     protected override Type ResultType => _resultParameter.ParameterType;
 
-    internal InputSolution(MethodInfo method, object solutionContainer) 
-        : base(method, solutionContainer) 
+    internal InputSolution(MethodInfo method, object solutionContainer)
+        : base(method, solutionContainer)
     {
     }
 

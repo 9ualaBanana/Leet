@@ -158,7 +158,7 @@ public class TestArgumentsProcessor : DynamicContextFixture
 
 
     [Theory]
-    [MemberData(nameof(StringSequenceData.NonJagged), MemberType = typeof(StringSequenceData))]
+    [MemberData(nameof(CollectionInStringData.NonJagged), MemberType = typeof(CollectionInStringData))]
     public void SolutionMethod_NonJaggedStringSequence_DoesNotThrow(string stringSequence, int[] _)
     {
         SolutionMethodStub
@@ -171,7 +171,7 @@ public class TestArgumentsProcessor : DynamicContextFixture
     }
     
     [Theory]
-    [MemberData(nameof(StringSequenceData.Jagged), MemberType = typeof(StringSequenceData))]
+    [MemberData(nameof(CollectionInStringData.Jagged), MemberType = typeof(CollectionInStringData))]
     public void SolutionMethod_JaggedStringSequence_DoesNotThrow(string stringSequence, int[][] _)
     {
         SolutionMethodStub
@@ -184,7 +184,7 @@ public class TestArgumentsProcessor : DynamicContextFixture
     }
 
     [Theory]
-    [MemberData(nameof(StringSequenceData.Erroneous), MemberType = typeof(StringSequenceData))]
+    [MemberData(nameof(CollectionInStringData.Erroneous), MemberType = typeof(CollectionInStringData))]
     public void SolutionMethodWithArrayParameter_NonSequenceString_Throws(string unsupportedString)
     {
         SolutionMethodStub
@@ -199,7 +199,7 @@ public class TestArgumentsProcessor : DynamicContextFixture
 
 
     [Theory]
-    [MemberData(nameof(StringSequenceData.NonJagged), MemberType = typeof(StringSequenceData))]
+    [MemberData(nameof(CollectionInStringData.NonJagged), MemberType = typeof(CollectionInStringData))]
     public void SolutionMethod_StringSequenceWithOtherArguments_CorrectlyProcesses(
         string stringSequence, int[] interpretedSequence
         )
@@ -218,8 +218,8 @@ public class TestArgumentsProcessor : DynamicContextFixture
     }
 
     [Theory]
-    [MemberData(nameof(StringSequenceData.Jagged), MemberType = typeof(StringSequenceData))]
-    [MemberData(nameof(StringSequenceData.NonJagged), MemberType = typeof(StringSequenceData))]
+    [MemberData(nameof(CollectionInStringData.Jagged), MemberType = typeof(CollectionInStringData))]
+    [MemberData(nameof(CollectionInStringData.NonJagged), MemberType = typeof(CollectionInStringData))]
     public void SolutionMethodWithStringParameter_StringSequence_DoesNotInterpret(string stringSequence, object _)
     {
         object?[]? arguments = new object[] { stringSequence };
@@ -252,7 +252,7 @@ public class TestArgumentsProcessor : DynamicContextFixture
     }
     
     [Theory]
-    [MemberData(nameof(StringSequenceData.NonJaggedDouble), MemberType = typeof(StringSequenceData))]
+    [MemberData(nameof(CollectionInStringData.NonJaggedDouble), MemberType = typeof(CollectionInStringData))]
     public void SolutionMethod_StringSequenceWithDoubleParameters_CorrectlyInterprets(string stringSequence, double[] interpretedSequence)
     {
         object?[]? arguments = new object[] { stringSequence };

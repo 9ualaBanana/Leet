@@ -1,4 +1,4 @@
-﻿namespace CCEasy.Services.ArgumentsProcessing.StringInterpreter;
+﻿namespace CCEasy.Services.StringInterpreter;
 
 internal record Brackets
 {

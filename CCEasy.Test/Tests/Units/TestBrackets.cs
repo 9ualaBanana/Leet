@@ -1,5 +1,5 @@
 ﻿using Xunit;
-using CCEasy.Services.ArgumentsProcessing.StringInterpreter;
+using CCEasy.Services.StringInterpreter;
 using System.Collections.Generic;
 using System;
 

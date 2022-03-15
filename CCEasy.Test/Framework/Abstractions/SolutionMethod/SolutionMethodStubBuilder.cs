@@ -1,5 +1,4 @@
 ﻿using Ardalis.GuardClauses;
-using CCEasy.Core;
 using CCEasy.Test.Framework.Abstractions.SolutionContext;
 using System;
 using System.Reflection;
