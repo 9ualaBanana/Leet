@@ -88,6 +88,7 @@ public class TestCollectionInStringInterpreter
 
     [Theory]
     [MemberData(nameof(CollectionInStringData.NonJagged), MemberType = typeof(CollectionInStringData))]
+    [MemberData(nameof(CollectionInStringData.SpacedNonJagged), MemberType = typeof(CollectionInStringData))]
     public void TryInterpret_CollectionInString_ReturnsInterpretedCollection(string collectionInString, int[] interpretedCollection)
     {
         object? argument = collectionInString;
@@ -99,6 +100,7 @@ public class TestCollectionInStringInterpreter
 
     [Theory]
     [MemberData(nameof(CollectionInStringData.Jagged), MemberType = typeof(CollectionInStringData))]
+    [MemberData(nameof(CollectionInStringData.SpacedJagged), MemberType = typeof(CollectionInStringData))]
     public void TryInterpret_JaggedCoolectionInString_ReturnsInterpretedCollection(string collectionInString, int[][] interpretedCollection)
     {
         object? argument = collectionInString;
@@ -123,6 +125,7 @@ public class TestCollectionInStringInterpreter
 
     [Theory]
     [MemberData(nameof(CollectionInStringData.NonJagged), MemberType = typeof(CollectionInStringData))]
+    [MemberData(nameof(CollectionInStringData.SpacedNonJagged), MemberType = typeof(CollectionInStringData))]
     public void ToEnumerable_CollectionInString_ReturnsInterpretedCollection(string collectionInString, int[] interpretedCollection)
     {
         Assert.Equal(interpretedCollection, SUT_CollectionInStringInterpreter(collectionInString, int.Parse).ToEnumerable());
@@ -130,6 +133,7 @@ public class TestCollectionInStringInterpreter
 
     [Theory]
     [MemberData(nameof(CollectionInStringData.NonJagged), MemberType = typeof(CollectionInStringData))]
+    [MemberData(nameof(CollectionInStringData.SpacedNonJagged), MemberType = typeof(CollectionInStringData))]
     public void ToArray_CollectionInString_ReturnsInterpretedCollection(string collectionInString, int[] interpretedCollection)
     {
         Assert.Equal(interpretedCollection, SUT_CollectionInStringInterpreter(collectionInString, int.Parse).ToArray());
@@ -137,6 +141,7 @@ public class TestCollectionInStringInterpreter
 
     [Theory]
     [MemberData(nameof(CollectionInStringData.Jagged), MemberType = typeof(CollectionInStringData))]
+    [MemberData(nameof(CollectionInStringData.SpacedJagged), MemberType = typeof(CollectionInStringData))]
     public void ToJaggedArray_CollectionInString_ReturnsInterpretedCollection(string collectionInString, int[][] interpretedCollection)
     {
         Assert.Equal(interpretedCollection, SUT_CollectionInStringInterpreter(collectionInString, int.Parse).ToJaggedArray());

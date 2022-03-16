@@ -115,7 +115,63 @@ internal static class CollectionInStringData
             {
                 "( ( 4, 3 ), (69, 5 ) )", new int[][] { new int[] { 4, 3 }, new int[] { 69, 5 } }
             };
+            
+        }
+    }
 
+    public static IEnumerable<object[]> SpacedNonJagged
+    {
+        get
+        {
+            yield return new object[]
+            {
+                @"[
+                    1, 1, 1, 1, 0
+                ]", new int[] { 1, 1, 1, 1, 0 }
+            };
+            yield return new object[]
+            {
+                "[\n 1, 1, 1, 1, 0" +
+                "]", new int[] { 1, 1, 1, 1, 0 }
+            };
+            yield return new object[]
+            {
+                "[\r\n 1, 1, 1, 1, 0]", new int[] { 1, 1, 1, 1, 0 }
+            };
+            yield return new object[]
+            {
+                "[\n" +
+                "   1, 1, 1, 1, 0]", new int[] { 1, 1, 1, 1, 0 }
+            };
+        }
+    }
+
+    public static IEnumerable<object[]> SpacedJagged
+    {
+        get
+        {
+            yield return new object[]
+            {
+                @"[
+                    [1, 1, 1, 1, 0]
+                ]", new int[][] { new int[] { 1, 1, 1, 1, 0 } }
+            };
+            yield return new object[]
+            {
+                "[\n[1, 1, 1, 1, 0]" +
+                "]", new int[][] { new int[] { 1, 1, 1, 1, 0 } }
+            };
+            yield return new object[]
+            {
+                "[\r\n[1, 1, 1, 1, 0]" +
+                "]", new int[][] { new int[] { 1, 1, 1, 1, 0 } }
+            };
+            yield return new object[]
+            {
+                "[\n" +
+                "   [1, 1, 1, 1, 0]" +
+                "]", new int[][] { new int[] { 1, 1, 1, 1, 0 } }
+            };
         }
     }
 

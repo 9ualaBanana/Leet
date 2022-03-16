@@ -83,7 +83,7 @@ public class CollectionInStringInterpreter<TInterpreted>
 
             foreach (var symbol in _collectionInString)
             {
-                if (symbol == _brackets.OpeningBracket || symbol == ' ')
+                if (symbol == _brackets.OpeningBracket || char.IsWhiteSpace(symbol))
                 {
                     if (symbol == _brackets.OpeningBracket) _dimensions++;
                     continue;
