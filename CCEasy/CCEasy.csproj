@@ -7,7 +7,7 @@
     <Product>CCEasy</Product>
     <Company>GualaBanana</Company>
     <Authors>GualaBanana</Authors>
-    <Version>2.0.3</Version>
+    <Version>2.0.4</Version>
     <Description>Tackling Coding Challenge solutions in the IDE of your choice has never been easier.</Description>
     <RepositoryUrl>https://github.com/GualaBanana/CCEasy</RepositoryUrl>
     <PackageTags>environment; framework; kata; leetcode; testing-tools; utility-library; leetcode-solutions; coding-challenges; leetcode-csharp; practice-programming; arrays-and-strings;</PackageTags>

@@ -3,7 +3,7 @@ using System.Text;
 
 namespace CCEasy.Services;
 
-internal class SolutionResultPresenter : IDisposable
+internal class SolutionResultPresenter
 {
     Stream _outputStream = Console.OpenStandardOutput();
     internal Stream OutputStream
@@ -56,7 +56,7 @@ internal class SolutionResultPresenter : IDisposable
         return displayableSequence.ToString();
     }
 
-    public void Dispose()
+    ~SolutionResultPresenter()
     {
         _ResultWriter.Close();
     }
