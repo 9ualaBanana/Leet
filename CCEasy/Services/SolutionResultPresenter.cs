@@ -3,7 +3,7 @@ using System.Text;
 
 namespace CCEasy.Services;
 
-internal class SolutionResultPresenter
+internal class SolutionResultPresenter : IDisposable
 {
     Stream _outputStream = Console.OpenStandardOutput();
     internal Stream OutputStream
@@ -11,6 +11,7 @@ internal class SolutionResultPresenter
         get => _outputStream;
         set
         {
+            _ResultWriter.Close();
             _resultWriter = null;
             _outputStream = value;
         }
@@ -24,7 +25,7 @@ internal class SolutionResultPresenter
         _ResultWriter.WriteLine($"{"Expected:", -10} {GetDisplayableRepresentation(expected)}");
         _ResultWriter.WriteLine($"{"Actual:", -10} {GetDisplayableRepresentation(actual)}");
         _ResultWriter.WriteLine();
-        _ResultWriter.Close();
+        _ResultWriter.Flush();
     }
 
     static string GetDisplayableRepresentation(object? value) => value switch
@@ -53,5 +54,10 @@ internal class SolutionResultPresenter
         }
         displayableSequence.Append(" ]");
         return displayableSequence.ToString();
+    }
+
+    public void Dispose()
+    {
+        _ResultWriter.Close();
     }
 }
