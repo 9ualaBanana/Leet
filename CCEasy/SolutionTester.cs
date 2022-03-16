@@ -1,6 +1,6 @@
 ﻿using CCEasy.Services;
 using CCEasy.Services.StringInterpreter;
-using CCEasy.SolutionMethods;
+using System.Reflection;
 
 namespace CCEasy;
 
@@ -9,9 +9,9 @@ namespace CCEasy;
 /// </summary>
 /// <typeparam name="TSolutionContainer">The type where the solution method is defined.</typeparam>
 /// <typeparam name="TResult">The result type of the solution method.</typeparam>
-public class SolutionTester<TSolutionContainer, TResult> where TSolutionContainer : class, new()
+public class SolutionTester<TSolutionContainer, TResult> where TSolutionContainer : new()
 {
-    readonly SolutionMethod<TResult> _solutionMethod;
+    readonly MethodInfo _solutionMethodInfo;
     readonly SolutionResultPresenter _resultPresenter;
 
     /// <summary>
@@ -20,20 +20,9 @@ public class SolutionTester<TSolutionContainer, TResult> where TSolutionContaine
     /// <remarks>
     /// The solution method must have a public access modifier.
     /// </remarks>
-    public SolutionTester() : this(new TSolutionContainer())
+    public SolutionTester()
     {
-    }
-
-    /// <summary>
-    /// Instantiates the tester for the solution method defined inside <paramref name="solutionContainer"/>.
-    /// </summary>
-    /// <remarks>
-    /// The solution method must have a public access modifier.
-    /// </remarks>
-    /// <param name="solutionContainer">The instance of <typeparamref name="TSolutionContainer"/> where the solution method is defined.</param>
-    public SolutionTester(TSolutionContainer solutionContainer)
-    {
-        _solutionMethod = SolutionMethodDiscoverer.SearchSolutionContainer<TResult>(solutionContainer);
+        _solutionMethodInfo = SolutionMethodDiscoverer.SearchSolutionContainer<TSolutionContainer>();
         _resultPresenter = new();
     }
 
@@ -70,7 +59,9 @@ public class SolutionTester<TSolutionContainer, TResult> where TSolutionContaine
     /// <param name="arguments">The arguments to the solution method being tested.</param>
     public void Test<TInterpreted>(TResult expected, Func<string, TInterpreted> interpreter, params object?[]? arguments)
     {
-        var actual = _solutionMethod.Invoke(arguments, interpreter);
+        var solutionMethod = SolutionMethodFactory.Create<TSolutionContainer, TResult>(_solutionMethodInfo);
+
+        var actual = solutionMethod.Invoke(arguments, interpreter);
 
         _resultPresenter.DisplayResults(expected, actual);
     }

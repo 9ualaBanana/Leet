@@ -1,22 +1,20 @@
-﻿using CCEasy.SolutionMethods;
-using System.Reflection;
+﻿using System.Reflection;
 
 namespace CCEasy.Services;
 
 internal static class SolutionMethodDiscoverer
 {
-    internal static SolutionMethod<TResult> SearchSolutionContainer<TResult>(object solutionContainer)
+    internal static MethodInfo SearchSolutionContainer<TSolutionContainer>()
     {
-        var singleSolutionMethod = solutionContainer.DiscoverSolutionMethod<TResult>();
-        return SolutionMethodFactory.Create<TResult>(singleSolutionMethod, solutionContainer);
+        return DiscoverSolutionMethod<TSolutionContainer>();
     }
-    static MethodInfo DiscoverSolutionMethod<TResult>(this object container)
+    static MethodInfo DiscoverSolutionMethod<TSolutionContainer>()
     {
-        return GetSingleSolutionInContainerOrThrow<TResult>(container);
+        return GetSingleSolutionInContainerOrThrow<TSolutionContainer>();
     }
-    static MethodInfo GetSingleSolutionInContainerOrThrow<TResult>(object container)
+    static MethodInfo GetSingleSolutionInContainerOrThrow<TSolutionContainer>()
     {
-        var validSolutionMethods = container.FindValidSolutionMethods();
+        var validSolutionMethods = FindValidSolutionMethods<TSolutionContainer>();
 
         if (!validSolutionMethods.Any())
         {
@@ -29,8 +27,8 @@ internal static class SolutionMethodDiscoverer
 
         return validSolutionMethods.Single();
     }
-    static IEnumerable<MethodInfo> FindValidSolutionMethods(this object container)
+    static IEnumerable<MethodInfo> FindValidSolutionMethods<TSolutionContainer>()
     {
-        return container.GetType().GetMethods().Where(SolutionMethodValidator.IsValidSolutionMethod);
+        return typeof(TSolutionContainer).GetMethods().Where(SolutionMethodValidator.IsValidSolutionMethod);
     }
 }

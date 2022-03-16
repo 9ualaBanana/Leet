@@ -10,15 +10,15 @@ namespace CCEasy.Test.Tests.Components;
 
 public class TestSolutionMethodDiscoverer : DynamicContextFixture
 {
-    Action SUT_SearchSolutionContainer<TResult>(TResult _)
+    Action SUT_SearchSolutionContainer<TSolutionContainer>()
     {
-        return () => SolutionMethodDiscoverer.SearchSolutionContainer<TResult>(_context.SolutionContainer.Instance);
+        return () => SolutionMethodDiscoverer.SearchSolutionContainer<TSolutionContainer>();
     }
 
 
 
     [Fact]
-    public void SUT_SolutionMethodInSolutionContainer_DoesNotThrow()
+    public void SearchSolutionContainer_WithSingleSolutionMethod_DoesNotThrow()
     {
         SolutionMethodStub
             .NewStub
@@ -26,22 +26,22 @@ public class TestSolutionMethodDiscoverer : DynamicContextFixture
             .Returning(TypeData.DummyType)
             .PutInContext(_context);
 
-        Assert.Null(Record.Exception(SUT_SearchSolutionContainer(TypeData.DummyValue)));
+        Assert.Null(Record.Exception(SUT_SearchSolutionContainer<HasSingleSolutionMethod>));
     }
 
     [Fact]
-    public void SUT_NoSolutionMethodInSolutionContainer_Throws()
+    public void SearchSolutionContainer_WithNoSolutionMethods_Throws()
     {
         SolutionMethodStub
             .NewStub
             .Returning(TypeData.DummyType)
             .PutInContext(_context);
 
-        Assert.Throws<EntryPointNotFoundException>(SUT_SearchSolutionContainer(TypeData.DummyType));
+        Assert.Throws<EntryPointNotFoundException>(SUT_SearchSolutionContainer<HasNoSolutionMethods>());
     }
 
     [Fact]
-    public void SUT_MultipleSolutionMethodsInSolutionContainer_Throws()
+    public void SearchSolutionContainer_WithMultipleSolutionMethods_Throws()
     {
         SolutionMethodStub
             .NewStub
@@ -55,6 +55,25 @@ public class TestSolutionMethodDiscoverer : DynamicContextFixture
             .Returning(typeof(void))
             .PutInContext(_context);
 
-        Assert.Throws<AmbiguousMatchException>(SUT_SearchSolutionContainer(TypeData.DummyType));
+        Assert.Throws<AmbiguousMatchException>(SUT_SearchSolutionContainer<HasMultipleSolutionMethods>());
     }
+}
+
+
+
+public class HasSingleSolutionMethod
+{
+    [Solution]
+    public int Solution() { return default; }
+}
+
+public class HasNoSolutionMethods
+{
+}
+
+public class HasMultipleSolutionMethods
+{
+    [Solution]
+    public int SolutionOne() { return default; }
+    public void SolutionTwo([Result] int result) { }
 }
