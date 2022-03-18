@@ -1,5 +1,6 @@
 ﻿using CCEasy.Services;
 using CCEasy.Services.StringInterpreter;
+using CCEasy.SolutionMethods;
 using System.Reflection;
 
 namespace CCEasy;
@@ -39,6 +40,16 @@ public class SolutionTester<TSolutionContainer, TResult> where TSolutionContaine
     /// <summary>
     /// The interface for exercising the associated solution method.
     /// </summary>
+    /// <param name="expected">The expected result of solution method.</param>
+    /// <param name="arguments">The arguments to the solution method being tested.</param>
+    public void Test(object? expected, params object?[]? arguments)
+    {
+        Test(expected, int.Parse, arguments);
+    }
+
+    /// <summary>
+    /// The interface for exercising the associated solution method.
+    /// </summary>
     /// <typeparam name="TInterpreted">The type of the elements inside the collection represented by <see cref="string"/> argument.</typeparam>
     /// <param name="expected">The expected result of the solution method.</param>
     /// <param name="interpreter">The delegate used for casting the elements inside the collection represented by <see cref="string"/> argument.</param>
@@ -46,7 +57,7 @@ public class SolutionTester<TSolutionContainer, TResult> where TSolutionContaine
     public void Test<TInterpreted>(object? expected, Func<string, TInterpreted> interpreter, params object?[]? arguments)
     {
         CollectionInStringInterpreter<TInterpreted>.TryInterpret(ref expected, interpreter);
-        TypeBinder.CanBind(expected?.GetType(), typeof(TResult));
+        SolutionMethod<TResult>.EnsureResultTypeCompatibility(expected?.GetType(), "expectedResult");
         Test((TResult)expected!, interpreter, arguments);
     }
 

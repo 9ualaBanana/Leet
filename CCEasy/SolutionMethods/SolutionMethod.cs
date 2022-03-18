@@ -29,7 +29,7 @@ internal abstract class SolutionMethod<TResult>
         _solutionContainer = solutionContainer;
         _method = method;
         Init();
-        EnsureResultTypeCompatibility();
+        EnsureResultTypeCompatibility(ResultType, nameof(ResultType));
     }
 
     /// <summary>
@@ -41,16 +41,14 @@ internal abstract class SolutionMethod<TResult>
     /// The constraint that satisfies both reference and nullable types doesn't exist.<br/>
     /// This method checks at runtime that <typeparamref name="TResult"/> conforms to these constraints.
     /// </summary>
-    /// <remarks>
-    /// Must be called at the end of the construction process.
-    /// </remarks>
     /// <exception cref="ArgumentException"></exception>
-    protected void EnsureResultTypeCompatibility()
+    static internal void EnsureResultTypeCompatibility(Type? type, string resultName)
     {
-        if (!TypeBinder.CanBind(ResultType, typeof(TResult)))
+        if (!TypeBinder.CanBind(type, typeof(TResult)))
         {
-            throw new ArgumentException($"The actual type of the solution result <{ResultType}> " +
-                $"is not compatible with the provided type parameter <{typeof(TResult)}>.");
+            var typeInfo = type is null ? "[null]" : $"<{type}>";
+            throw new ArgumentException($"The solution result {typeInfo} " +
+                $"is not compatible with the provided type parameter <{typeof(TResult)}>.", resultName);
         }
     }
 
