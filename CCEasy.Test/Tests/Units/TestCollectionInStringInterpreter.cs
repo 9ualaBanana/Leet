@@ -155,4 +155,19 @@ public class TestCollectionInStringInterpreter
     {
         Assert.Equal(interpretedCollection, SUT_CollectionInStringInterpreter(collectionInString, double.Parse).ToArray());
     }
+
+    [Theory]
+    [MemberData(nameof(CollectionInStringData.NonJaggedChar), MemberType = typeof(CollectionInStringData))]
+    public void ToArray_CollectionOfCharsInString_ReturnsInterpretedCollection(string collectionInString, char[] interpretedCollection)
+    {
+        Assert.Equal(interpretedCollection, SUT_CollectionInStringInterpreter(collectionInString, char.Parse).ToArray());
+    }
+
+    [Theory]
+    [MemberData(nameof(CollectionInStringData.JaggedChar), MemberType = typeof(CollectionInStringData))]
+    public void ToJaggedArray_JaggedCollectionOfCharsInString_ReturnsInterpretedCollection(string collectionInString, char[][] interpretedCollection)
+    {
+        Assert.Equal(interpretedCollection, SUT_CollectionInStringInterpreter(collectionInString, char.Parse).ToJaggedArray());
+    }
+
 }

@@ -5,7 +5,7 @@ namespace CCEasy.Services.StringInterpreter;
 /// <summary>
 /// Provides the means for retrieving objects derived from <see cref="IEnumerable{T}"/> represented as <see cref="string"/>.
 /// </summary>
-/// <typeparam name="TInterpreted">The type of elements of the resulting objects derived from <see cref="IEnumerable{T}"/>.</typeparam>
+/// <typeparam name="TInterpreted">The type of elements of the resulting object derived from <see cref="IEnumerable{T}"/>.</typeparam>
 public class CollectionInStringInterpreter<TInterpreted>
 {
     readonly string _collectionInString;
@@ -18,7 +18,7 @@ public class CollectionInStringInterpreter<TInterpreted>
         $@"\{_brackets.OpeningBracket}\s*
         (?<{_elementsCapturingGroup}>
             (
-                (?<digit>[-+]?( \d+ | \d+\.\d+ | \.\d+ ))
+                (?<element>[^\{_brackets.OpeningBracket}\s\{_brackets.ClosingBracket}]+?)
                 (?<separator>\s*,\s*)?
             )+  # Wraps elemenets as an integral whole.
         )

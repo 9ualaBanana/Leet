@@ -202,6 +202,61 @@ internal static class CollectionInStringData
         }
     }
 
+    public static IEnumerable<object[]> NonJaggedChar
+    {
+        get
+        {
+            yield return new object[]
+            {
+                " [ ., +, 3, -, 0 ] ", new char[] {'.', '+', '3', '-', '0' }
+            };
+            yield return new object[]
+            {
+                "[.]", new char[] { '.' }
+            };
+            yield return new object[]
+            {
+                "[ 4 ]", new char[] { '4' }
+            };
+            yield return new object[]
+            {
+                "[ -, 0 ]", new char[] { '-', '0' }
+            };
+            yield return new object[]
+            {
+                "  [ * , # ] ", new char[] { '*', '#' }
+            };
+        }
+    }
+
+    public static IEnumerable<object[]> JaggedChar
+    {
+        get
+        {
+            yield return new object[]
+            {
+                " [ [., +], [3, -, 0] ] ", new char[][] { new char[] { '.', '+' }, new char[] { '3', '-', '0' } }
+            };
+            yield return new object[]
+            {
+                "[[.]]", new char[][] { new char[] { '.' } }
+            };
+            yield return new object[]
+            {
+                "[ [4 ] ]", new char[][] { new char[] { '4' } }
+            };
+            yield return new object[]
+            {
+                "[[-], [0] ]", new char[][] { new char[] { '-' }, new char[] { '0' } }
+            };
+            yield return new object[]
+            {
+                "  [[ * , # ]] ", new char[][] { new char[] { '*', '#' } }
+            };
+        }
+    }
+
+
     public static IEnumerable<object[]> Erroneous
     {
         get
@@ -213,7 +268,6 @@ internal static class CollectionInStringData
             yield return new object[] { "[[[[" };
             yield return new object[] { "]]]]" };
             yield return new object[] { "unsupported" };
-            yield return new object[] { "[unsupported]" };
             yield return new object[] { "(>" };
             yield return new object[] { "{]" };
             yield return new object[] { "[)" };
