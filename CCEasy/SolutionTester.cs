@@ -22,14 +22,16 @@
 
 using CCEasy.Services;
 using CCEasy.Services.StringInterpreter;
-using CCEasy.SolutionMethods;
 using System.Reflection;
 
 namespace CCEasy;
 
 /// <summary>
-/// Provides the interface for exercising solution methods.
+/// Provides the type-safe interface for exercising solution methods.
 /// </summary>
+/// <remarks>
+/// Supports passing of <see cref="IEnumerable{T}"/> arguments as <see cref="string"/>s.
+/// </remarks>
 /// <typeparam name="TSolutionContainer">The type where the solution method is defined.</typeparam>
 /// <typeparam name="TResult">The result type of the solution method.</typeparam>
 public class SolutionTester<TSolutionContainer, TResult> where TSolutionContainer : new()
@@ -52,6 +54,9 @@ public class SolutionTester<TSolutionContainer, TResult> where TSolutionContaine
     /// <summary>
     /// The interface for exercising the associated solution method.
     /// </summary>
+    /// <remarks>
+    /// <paramref name="arguments"/> are type-safe and resolved at runtime.
+    /// </remarks>
     /// <param name="expected">The expected result of solution method.</param>
     /// <param name="arguments">The arguments to the solution method being tested.</param>
     public void Test(TResult expected, params object?[]? arguments)
@@ -62,6 +67,9 @@ public class SolutionTester<TSolutionContainer, TResult> where TSolutionContaine
     /// <summary>
     /// The interface for exercising the associated solution method.
     /// </summary>
+    /// <remarks>
+    /// <paramref name="arguments"/> are type-safe and resolved at runtime.
+    /// </remarks>
     /// <param name="expected">The expected result of solution method.</param>
     /// <param name="arguments">The arguments to the solution method being tested.</param>
     public void Test(object? expected, params object?[]? arguments)
@@ -72,6 +80,9 @@ public class SolutionTester<TSolutionContainer, TResult> where TSolutionContaine
     /// <summary>
     /// The interface for exercising the associated solution method.
     /// </summary>
+    /// <remarks>
+    /// <paramref name="arguments"/> are type-safe and resolved at runtime.
+    /// </remarks>
     /// <typeparam name="TInterpreted">The type of the elements inside the collection represented by <see cref="string"/> argument.</typeparam>
     /// <param name="expected">The expected result of the solution method.</param>
     /// <param name="interpreter">The delegate used for casting the elements inside the collection represented by <see cref="string"/> argument.</param>
@@ -79,22 +90,24 @@ public class SolutionTester<TSolutionContainer, TResult> where TSolutionContaine
     public void Test<TInterpreted>(object? expected, Func<string, TInterpreted> interpreter, params object?[]? arguments)
     {
         CollectionInStringInterpreter<TInterpreted>.TryInterpret(ref expected, interpreter);
-        SolutionMethod<TResult>.EnsureResultTypeCompatibility(expected?.GetType(), "expectedResult");
-        Test((TResult)expected!, interpreter, arguments);
+        Test(TypeBinder.Cast<TResult>(expected), interpreter, arguments);
     }
 
     /// <summary>
     /// The interface for exercising the associated solution method.
     /// </summary>
+    /// <remarks>
+    /// <paramref name="arguments"/> are type-safe and resolved at runtime.
+    /// </remarks>
     /// <typeparam name="TInterpreted">The type of the elements inside the collection represented by <see cref="string"/> argument.</typeparam>
     /// <param name="expected">The expected result of the solution method.</param>
     /// <param name="interpreter">The delegate used for casting the elements inside the collection represented by <see cref="string"/> argument.</param>
     /// <param name="arguments">The arguments to the solution method being tested.</param>
     public void Test<TInterpreted>(TResult expected, Func<string, TInterpreted> interpreter, params object?[]? arguments)
     {
-        var solutionMethod = SolutionMethodFactory.Create<TSolutionContainer, TResult>(_solutionMethodInfo);
+        var solutionMethod = SolutionMethodFactory.Create<TSolutionContainer>(_solutionMethodInfo);
 
-        var actual = solutionMethod.Invoke(arguments, interpreter);
+        var actual = solutionMethod.Invoke<TResult, TInterpreted>(arguments, interpreter);
 
         _resultPresenter.DisplayResults(expected, actual);
     }

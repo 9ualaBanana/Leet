@@ -24,16 +24,13 @@ using System.Reflection;
 
 namespace CCEasy.SolutionMethods;
 
-internal class OutputSolution<TResult> : SolutionMethod<TResult>
+/// <summary>
+/// Retrieves the solution result from the return value of the labeled method it represents.
+/// </summary>
+internal class OutputSolution : SolutionMethod
 {
-    protected override Type ResultType => _method.ReturnType;
-
     internal OutputSolution(MethodInfo method, object solutionContainer)
         : base(method, solutionContainer)
-    {
-    }
-
-    protected override void Init()
     {
     }
 

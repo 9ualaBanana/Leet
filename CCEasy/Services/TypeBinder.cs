@@ -34,6 +34,24 @@ internal static class TypeBinder
         return CanBind(argumentType, parameterType);
     }
 
+    /// <summary>
+    /// The constraint that satisfies both reference and nullable types doesn't exist, so this method makes up for it.
+    /// </summary>
+    /// <remarks>
+    /// Provides a little more descriptive exception.
+    /// </remarks>
+    /// <exception cref="ArgumentException">The contstraint is not satisfied.</exception>
+    internal static TResult Cast<TResult>(object? obj)
+    {
+        var objectType = obj?.GetType();
+        // Conversion of `null` to `TResult` won't throw if the types are compatible.
+        if (CanBind(objectType, typeof(TResult))) return (TResult)obj!;
+
+        var typeInfo = obj is null ? "[null]" : $"<{objectType}>";
+        throw new ArgumentException($"{typeInfo} value " +
+            $"is not compatible with the provided type parameter <{typeof(TResult)}>.");
+    }
+
     internal static bool CanBind(Type? originType, Type targetType)
     {
         if (originType is null) return CanHoldNull(targetType);

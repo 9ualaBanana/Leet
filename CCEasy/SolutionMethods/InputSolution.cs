@@ -24,17 +24,15 @@ using System.Reflection;
 
 namespace CCEasy.SolutionMethods;
 
-internal class InputSolution<TResult> : SolutionMethod<TResult>
+/// <summary>
+/// Retrieves the solution result from the labeled parameter of the method it represents.
+/// </summary>
+internal class InputSolution : SolutionMethod
 {
-    ParameterInfo _resultParameter = null!;
-    protected override Type ResultType => _resultParameter.ParameterType;
+    readonly ParameterInfo _resultParameter;
 
     internal InputSolution(MethodInfo method, object solutionContainer)
         : base(method, solutionContainer)
-    {
-    }
-
-    protected override void Init()
     {
         _resultParameter = _method.GetParameters()
             .Single(parameter => parameter.IsDefined(typeof(ResultAttribute)));
