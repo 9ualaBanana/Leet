@@ -14,7 +14,7 @@ But it's *arguably* a more convenient option because now you are faced with othe
 ...especially **arrays** that are ubiquitous in those challenges, and only their construction alone takes a significant amount of time.
 And what if they are jagged?.. \**sigh*\*
 
-***Lit*** is designed to make working on solutions in your favorite IDE **trivial** avoiding all the common inconveniences related to that.
+***Leet*** is designed to make working on solutions in your favorite IDE **trivial** avoiding all the common inconveniences related to that.
 
 ## 🥗 Recipes
 ### 🟢 Let It Help You
