@@ -8,12 +8,13 @@
     <Company>GualaBanana</Company>
     <Authors>GualaBanana</Authors>
 	<Copyright>© GualaBanana 2022</Copyright>
-    <Version>4.0.0</Version>
+    <Version>4.0.1</Version>
     <Description>Tackling Coding Challenges as easy as it gets.</Description>
     <RepositoryUrl>https://github.com/GualaBanana/Leet</RepositoryUrl>
     <PackageTags>environment; framework; kata; leetcode; testing-tools; utility-library; leetcode-solutions; coding-challenges; leetcode-csharp; practice-programming; arrays-and-strings;</PackageTags>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+	<PackageReleaseNotes>Fix bug with solution container instance being shared across test runs.</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>

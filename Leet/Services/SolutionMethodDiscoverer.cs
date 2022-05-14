@@ -26,11 +26,11 @@ namespace Leet.Services;
 
 internal class SolutionMethodDiscoverer
 {
-    readonly object _solutionContainer;
+    readonly Type _solutionContainerType;
 
-    internal SolutionMethodDiscoverer(object solutionContainer)
+    internal SolutionMethodDiscoverer(Type solutionContainerType)
     {
-        _solutionContainer = solutionContainer;
+        _solutionContainerType = solutionContainerType;
     }
 
     internal MethodInfo DiscoverSolutionMethodInfo()
@@ -55,6 +55,6 @@ internal class SolutionMethodDiscoverer
     }
     IEnumerable<MethodInfo> FindValidSolutionMethods()
     {
-        return _solutionContainer.GetType().GetMethods().Where(SolutionMethod.IsValid);
+        return _solutionContainerType.GetMethods().Where(SolutionMethod.IsValid);
     }
 }

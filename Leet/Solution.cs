@@ -35,7 +35,7 @@ namespace Leet;
 /// <typeparam name="TResult">The result type of the solution method.</typeparam>
 public class Solution<TSolutionContainer, TResult> where TSolutionContainer : new()
 {
-    readonly SolutionMethod _solutionMethod;
+    SolutionMethod _solutionMethod = default!;
     readonly SolutionResultPresenter _resultPresenter;
 
     /// <summary>
@@ -46,11 +46,6 @@ public class Solution<TSolutionContainer, TResult> where TSolutionContainer : ne
     /// </remarks>
     public Solution()
     {
-        var solutionContainer = new TSolutionContainer();
-        _solutionMethod = new(
-            method: new SolutionMethodDiscoverer(solutionContainer).DiscoverSolutionMethodInfo(),
-            solutionContainer
-            );
         _resultPresenter = new();
     }
 
@@ -112,6 +107,13 @@ public class Solution<TSolutionContainer, TResult> where TSolutionContainer : ne
     /// <param name="arguments">The arguments to the solution method.</param>
     public void Test<TInterpreted>(TResult expected, Func<string, TInterpreted> interpreter, params object?[]? arguments)
     {
+        // Solution method is instantiated anew for each test run
+        // to ensure its solution container's state is not invalidated by previous test runs.
+        _solutionMethod = new(
+            method: new SolutionMethodDiscoverer(typeof(TSolutionContainer)).DiscoverSolutionMethodInfo(),
+            new TSolutionContainer()
+            );
+
         var actual = _solutionMethod.Invoke<TResult, TInterpreted>(arguments, interpreter);
 
         _resultPresenter.DisplayResults(expected, actual);
