@@ -20,10 +20,10 @@
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
 
+using Leet.Services;
 using Leet.Test.Framework.Abstractions.SolutionContext;
 using Leet.Test.Framework.Abstractions.SolutionMethod;
 using Leet.Test.Framework.TestData;
-using Lit.Services;
 using System;
 using System.Reflection;
 using Xunit;
@@ -79,23 +79,4 @@ public class TestSolutionMethodDiscoverer : DynamicContextFixture
 
         Assert.Throws<AmbiguousMatchException>(SUT_SearchSolutionContainer<HasMultipleSolutionMethods>());
     }
-}
-
-
-
-public class HasSingleSolutionMethod
-{
-    [Solution]
-    public int Solution() { return default; }
-}
-
-public class HasNoSolutionMethods
-{
-}
-
-public class HasMultipleSolutionMethods
-{
-    [Solution]
-    public int SolutionOne() { return default; }
-    public void SolutionTwo([Result] int result) { }
 }

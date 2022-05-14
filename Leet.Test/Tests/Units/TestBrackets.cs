@@ -21,9 +21,9 @@
 //SOFTWARE.
 
 using Xunit;
-using Lit.Services.StringInterpreter;
 using System.Collections.Generic;
 using System;
+using Leet.Services.StringInterpreter;
 
 namespace Leet.Test.Tests.Units;
 
